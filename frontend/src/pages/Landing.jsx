@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Zap, Target, TrendingUp, BookOpen, Mic2, PenLine, Headphones } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const features = [
   { icon: PenLine, title: 'AI Writing Coach', desc: 'Real-time band scores across all 4 IELTS criteria with line-by-line feedback.', color: 'var(--accent-primary)' },
@@ -18,9 +19,8 @@ export default function Landing() {
 
       {/* Navbar */}
       <nav style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 40px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'white' }}>I</div>
-          <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 18, color: 'var(--text-primary)' }}>IELTS AI</span>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={logo} alt="Smart IELTS" style={{ height: 38, objectFit: 'contain' }} />
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <Link to="/login" style={{ padding: '9px 20px', borderRadius: 10, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 14, fontWeight: 500, fontFamily: 'Space Grotesk', transition: 'all 0.2s' }}>Log in</Link>
@@ -97,7 +97,7 @@ export default function Landing() {
       </section>
 
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--border)', padding: '24px 40px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
-        © 2024 IELTS AI Platform. Powered by Claude AI.
+        © 2025 Smart IELTS. Smart Way to Your Target Score.
       </footer>
     </div>
   );
