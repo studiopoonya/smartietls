@@ -1,0 +1,55 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          echo "VITE_API_URL=https://api.smartietls.online" > .env.production
+          npm run build
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /www/wwwroot/api.smartietls.online/backend
+            git pull origin main
+            /www/server/php/84/bin/php /usr/bin/composer install --optimize-autoloader --no-dev --ignore-platform-req=ext-fileinfo
+            /www/server/php/84/bin/php artisan migrate --force
+            /www/server/php/84/bin/php artisan config:cache
+            /www/server/php/84/bin/php artisan route:cache
+            chmod -R 775 storage bootstrap/cache
+            chown -R www:www storage bootstrap/cache
+
+      - name: Copy frontend build to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "frontend/dist/*"
+          target: "/www/wwwroot/smartietls.online/"
+          strip_components: 2
