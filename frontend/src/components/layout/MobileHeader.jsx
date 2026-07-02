@@ -1,5 +1,6 @@
 import { Menu, Flame, Target } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import logo from '../../assets/logo.png';
 
 export default function MobileHeader({ onMenuOpen }) {
   const user = useAppStore(s => s.user);
@@ -13,13 +14,8 @@ export default function MobileHeader({ onMenuOpen }) {
       padding: '12px 16px',
     }}>
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{
-          width: 30, height: 30, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))',
-          borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 15, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'white',
-        }}>I</div>
-        <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 16, color: 'var(--text-primary)' }}>IELTS AI</span>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <img src={logo} alt="Smart IELTS" style={{ height: 30, objectFit: 'contain' }} />
       </div>
 
       {/* Stats + hamburger */}

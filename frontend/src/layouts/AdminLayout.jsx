@@ -5,6 +5,7 @@ import { LayoutDashboard, Users, LogOut, Shield, Menu, X } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useLogout } from '../hooks/useAuth';
 import { useIsMobile } from '../hooks/useIsMobile';
+import logo from '../assets/logo.png';
 
 const NAV = [
   { to: '/admin', end: true, icon: LayoutDashboard, label: 'Overview' },
@@ -111,7 +112,7 @@ export default function AdminLayout() {
             </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--text-primary)', lineHeight: 1.2 }}>Admin Panel</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>IELTS AI</div>
+              <img src={logo} alt="Smart IELTS" style={{ height: 14, objectFit: 'contain', marginTop: 2 }} />
             </div>
           </div>
         </div>

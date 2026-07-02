@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Flame, Target, Lightbulb, GraduationCap } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLogout } from '../../hooks/useAuth';
+import logo from '../../assets/logo.png';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -30,14 +31,9 @@ export default function Sidebar() {
       position: 'sticky', top: 0, height: '100vh', overflowY: 'auto'
     }}>
       {/* Logo */}
-      <div style={{ padding: '24px 20px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'white', flexShrink: 0 }}>I</div>
-          <div>
-            <div style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>IELTS AI</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>AI-Powered Learning</div>
-          </div>
-        </div>
+      <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border)' }}>
+        <img src={logo} alt="Smart IELTS" style={{ height: 40, objectFit: 'contain', display: 'block' }} />
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: '0.04em' }}>SMART WAY TO YOUR TARGET SCORE</div>
       </div>
 
       {/* Nav */}

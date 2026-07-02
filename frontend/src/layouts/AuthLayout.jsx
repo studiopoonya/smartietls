@@ -1,5 +1,6 @@
 import { Outlet, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import logo from '../assets/logo.png';
 
 export default function AuthLayout() {
   return (
@@ -12,9 +13,8 @@ export default function AuthLayout() {
       }} />
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <header style={{ padding: '20px 32px' }}>
-          <Link to="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, fontFamily: 'Space Grotesk' }}>I</div>
-            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 18, color: 'var(--text-primary)' }}>IELTS AI</span>
+          <Link to="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+            <img src={logo} alt="Smart IELTS" style={{ height: 36, objectFit: 'contain' }} />
           </Link>
         </header>
         <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>

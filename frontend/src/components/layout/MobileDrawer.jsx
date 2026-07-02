@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Settings, Lightbulb, GraduationCap } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLogout } from '../../hooks/useAuth';
+import logo from '../../assets/logo.png';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -45,9 +46,8 @@ export default function MobileDrawer({ open, onClose }) {
             }}>
             {/* Header */}
             <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 34, height: 34, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'white' }}>I</div>
-                <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 16 }}>IELTS AI</span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <img src={logo} alt="Smart IELTS" style={{ height: 32, objectFit: 'contain' }} />
               </div>
               <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}>
                 <X size={16} />
