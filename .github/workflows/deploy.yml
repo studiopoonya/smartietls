@@ -53,3 +53,22 @@ jobs:
           source: "frontend/dist/*"
           target: "/www/wwwroot/smartietls.online/"
           strip_components: 2
+
+      - name: Write .htaccess for SPA routing
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cat > /www/wwwroot/smartietls.online/.htaccess << 'HTEOF'
+            <IfModule mod_rewrite.c>
+              RewriteEngine On
+              RewriteBase /
+              RewriteRule ^index\.html$ - [L]
+              RewriteCond %{REQUEST_FILENAME} !-f
+              RewriteCond %{REQUEST_FILENAME} !-d
+              RewriteRule . /index.html [L]
+            </IfModule>
+            HTEOF
