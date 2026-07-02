@@ -23,7 +23,7 @@ jobs:
         run: |
           cd frontend
           npm install
-          echo "VITE_API_URL=https://api.smartietls.online" > .env.production
+          echo "VITE_API_URL=https://api.smartietls.online/api" > .env.production
           npm run build
 
       - name: Deploy to VPS
