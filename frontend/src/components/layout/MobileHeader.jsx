@@ -1,6 +1,6 @@
 import { Menu, Flame, Target } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo-removebg-preview.png';
 
 export default function MobileHeader({ onMenuOpen }) {
   const user = useAppStore(s => s.user);

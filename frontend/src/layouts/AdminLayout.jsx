@@ -5,7 +5,7 @@ import { LayoutDashboard, Users, LogOut, Shield, Menu, X } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useLogout } from '../hooks/useAuth';
 import { useIsMobile } from '../hooks/useIsMobile';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-removebg-preview.png';
 
 const NAV = [
   { to: '/admin', end: true, icon: LayoutDashboard, label: 'Overview' },

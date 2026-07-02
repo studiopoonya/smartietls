@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Settings, Lightbulb, GraduationCap } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLogout } from '../../hooks/useAuth';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo-removebg-preview.png';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },

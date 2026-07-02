@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Zap, Target, TrendingUp, BookOpen, Mic2, PenLine, Headphones } from 'lucide-react';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-removebg-preview.png';
 
 const features = [
   { icon: PenLine, title: 'AI Writing Coach', desc: 'Real-time band scores across all 4 IELTS criteria with line-by-line feedback.', color: 'var(--accent-primary)' },
