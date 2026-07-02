@@ -31,10 +31,6 @@ export default function Landing() {
       {/* Hero */}
       <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '100px 40px 80px' }}>
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 20, padding: '6px 16px', marginBottom: 32 }}>
-            <Zap size={14} style={{ color: 'var(--accent-glow)' }} />
-            <span style={{ fontSize: 13, color: 'var(--accent-glow)', fontWeight: 600, fontFamily: 'Space Grotesk' }}>Powered by Claude AI</span>
-          </div>
           <h1 style={{ fontSize: 'clamp(40px, 7vw, 76px)', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 24, maxWidth: 800, margin: '0 auto 24px' }}>
             Score Band 7+ with
             <span style={{ display: 'block', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>AI-Powered IELTS Prep</span>
