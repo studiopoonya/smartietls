@@ -22,7 +22,7 @@ jobs:
       - name: Build frontend
         run: |
           cd frontend
-          npm ci
+          npm install
           echo "VITE_API_URL=https://api.smartietls.online" > .env.production
           npm run build
 
