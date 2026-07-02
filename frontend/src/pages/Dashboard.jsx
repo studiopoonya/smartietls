@@ -74,8 +74,8 @@ export default function Dashboard() {
         )}
       </motion.div>
 
-      {/* No API key warning */}
-      {!user?.has_api_key && (
+      {/* No API key warning — admin only */}
+      {storeUser?.is_admin && !user?.has_api_key && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', gap: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
           <AlertCircle size={16} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 1 }} />
           <div>
