@@ -18,8 +18,7 @@ const navItems = [
   { to: '/progress', icon: TrendingUp, label: 'Progress' },
   { to: '/tips', icon: Lightbulb, label: 'Tips & Tricks' },
   { to: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
-  { label: 'ACCOUNT', isHeader: true },
-  { to: '/setup', icon: Settings, label: 'API Key Settings' },
+  { to: '/setup', icon: Settings, label: 'API Key Settings', adminOnly: true },
 ];
 
 export default function MobileDrawer({ open, onClose }) {
@@ -69,7 +68,7 @@ export default function MobileDrawer({ open, onClose }) {
 
             {/* Nav */}
             <nav style={{ flex: 1, padding: '8px 12px' }}>
-              {navItems.map((item, i) => {
+              {navItems.filter(item => !item.adminOnly || user?.is_admin).map((item, i) => {
                 if (item.isHeader) return (
                   <div key={i} style={{ padding: '16px 8px 6px', fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: 'Space Grotesk' }}>{item.label}</div>
                 );

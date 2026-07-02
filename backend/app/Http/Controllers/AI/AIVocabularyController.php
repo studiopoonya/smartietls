@@ -20,8 +20,9 @@ class AIVocabularyController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $context = $request->context ? " (seen in context: \"{$request->context}\")" : '';
@@ -29,7 +30,7 @@ class AIVocabularyController extends Controller
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::VOCAB_COACH,
                 $userMessage,
                 600,

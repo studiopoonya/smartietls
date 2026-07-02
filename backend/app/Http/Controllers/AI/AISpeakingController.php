@@ -21,8 +21,9 @@ class AISpeakingController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $history = $request->history ?? [];
@@ -35,7 +36,7 @@ class AISpeakingController extends Controller
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::SPEAKING_EXAMINER,
                 $userMessage,
                 2000
@@ -50,13 +51,14 @@ class AISpeakingController extends Controller
     public function generate(Request $request): JsonResponse
     {
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::SPEAKING_QUESTION_GENERATOR,
                 'Generate a new IELTS Speaking test question set with a random topic.',
                 1500
@@ -77,15 +79,16 @@ class AISpeakingController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $userMessage = "Part {$request->part} Question: {$request->question}\n\nCandidate's Answer: {$request->answer}";
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::SPEAKING_ANSWER_EVALUATOR,
                 $userMessage,
                 1500

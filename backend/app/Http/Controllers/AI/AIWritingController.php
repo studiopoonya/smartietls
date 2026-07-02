@@ -21,15 +21,16 @@ class AIWritingController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $userMessage = "Task Type: IELTS Writing {$request->task_type}\nPrompt: {$request->prompt}\n\nEssay:\n{$request->essay}";
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::WRITING_EVALUATOR,
                 $userMessage,
                 3000

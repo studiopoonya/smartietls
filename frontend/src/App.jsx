@@ -69,7 +69,6 @@ export default function App() {
               <Route path="/register" element={<Register />} />
             </Route>
             <Route element={<Protected><AppLayout /></Protected>}>
-              <Route path="/setup" element={<Setup />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/learn/writing" element={<Writing />} />
               <Route path="/learn/speaking" element={<Speaking />} />
@@ -80,6 +79,9 @@ export default function App() {
               <Route path="/progress" element={<Progress />} />
               <Route path="/tips" element={<Tips />} />
               <Route path="/scholarships" element={<Scholarships />} />
+            </Route>
+            <Route element={<AdminGuard><AppLayout /></AdminGuard>}>
+              <Route path="/setup" element={<Setup />} />
             </Route>
             <Route element={<AdminGuard><AdminLayout /></AdminGuard>}>
               <Route path="/admin" element={<AdminOverview />} />

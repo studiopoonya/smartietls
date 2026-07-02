@@ -12,7 +12,7 @@ export function useLogin() {
     onSuccess: ({ user, token }) => {
       localStorage.setItem('auth_token', token);
       setUser(user);
-      navigate(user.is_admin ? '/admin' : user.has_api_key ? '/dashboard' : '/setup');
+      navigate(user.is_admin ? '/admin' : '/dashboard');
     },
   });
 }
@@ -26,7 +26,7 @@ export function useRegister() {
     onSuccess: ({ user, token }) => {
       localStorage.setItem('auth_token', token);
       setUser(user);
-      navigate('/setup');
+      navigate(user.is_admin ? '/admin' : '/dashboard');
     },
   });
 }

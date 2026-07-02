@@ -22,8 +22,9 @@ class AIMockTestController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $userMessage = "Evaluate this IELTS Mock Test:\n\n";
@@ -34,7 +35,7 @@ class AIMockTestController extends Controller
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::MOCK_TEST_EVALUATOR,
                 $userMessage,
                 2000

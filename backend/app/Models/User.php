@@ -61,6 +61,19 @@ class User extends Authenticatable
         return !empty($this->attributes['anthropic_api_key']);
     }
 
+    public static function systemApiKey(): ?string
+    {
+        $admin = static::where('is_admin', true)
+            ->whereNotNull('anthropic_api_key')
+            ->first();
+        return $admin?->getDecryptedApiKey();
+    }
+
+    public function effectiveApiKey(): ?string
+    {
+        return $this->hasApiKey() ? $this->getDecryptedApiKey() : static::systemApiKey();
+    }
+
     public function getHasApiKeyAttribute(): bool
     {
         return !empty($this->attributes['anthropic_api_key']);

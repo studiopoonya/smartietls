@@ -22,8 +22,9 @@ class AIReadingController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $unlocked   = LevelService::unlockedLevel($user, 'reading');
@@ -43,7 +44,7 @@ class AIReadingController extends Controller
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::READING_GENERATOR,
                 $userMessage,
                 3000

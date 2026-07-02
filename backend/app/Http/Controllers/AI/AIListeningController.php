@@ -23,8 +23,9 @@ class AIListeningController extends Controller
         ]);
 
         $user = $request->user();
-        if (!$user->hasApiKey()) {
-            return response()->json(['message' => 'API key not configured'], 422);
+        $apiKey = $user->effectiveApiKey();
+        if (!$apiKey) {
+            return response()->json(['message' => 'API key not configured. Please contact admin.'], 422);
         }
 
         $unlocked   = LevelService::unlockedLevel($user, 'listening');
@@ -50,7 +51,7 @@ class AIListeningController extends Controller
 
         try {
             $result = $this->claude->getJson(
-                $user->getDecryptedApiKey(),
+                $apiKey,
                 Prompts::LISTENING_GENERATOR,
                 $userMessage,
                 4000
