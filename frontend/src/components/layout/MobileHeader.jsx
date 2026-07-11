@@ -1,14 +1,16 @@
-import { Menu, Flame, Target } from 'lucide-react';
+import { Menu, Flame, Target, Sun, Moon } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import logo from '../../assets/logo-removebg-preview.png';
 
 export default function MobileHeader({ onMenuOpen }) {
   const user = useAppStore(s => s.user);
+  const theme = useAppStore(s => s.theme);
+  const toggleTheme = useAppStore(s => s.toggleTheme);
 
   return (
     <header style={{
       position: 'sticky', top: 0, zIndex: 50,
-      background: 'rgba(17,17,24,0.92)', backdropFilter: 'blur(20px)',
+      background: 'var(--header-bg)', backdropFilter: 'blur(20px)',
       borderBottom: '1px solid var(--border)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '12px 16px',
@@ -32,6 +34,12 @@ export default function MobileHeader({ onMenuOpen }) {
             </div>
           </>
         )}
+        <button onClick={toggleTheme} style={{
+          width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)',
+        }}>
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
         <button onClick={onMenuOpen} style={{
           width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)',

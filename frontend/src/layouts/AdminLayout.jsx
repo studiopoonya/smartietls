@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Users, LogOut, Shield, Menu, X, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Shield, Menu, X, Settings, Sun, Moon } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useLogout } from '../hooks/useAuth';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -15,6 +15,8 @@ const NAV = [
 
 export default function AdminLayout() {
   const user = useAppStore(s => s.user);
+  const theme = useAppStore(s => s.theme);
+  const toggleTheme = useAppStore(s => s.toggleTheme);
   const logout = useLogout();
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,16 +24,21 @@ export default function AdminLayout() {
   if (isMobile) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-        <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(17,17,24,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px' }}>
+        <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'var(--header-bg)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
             <div style={{ width: 30, height: 30, borderRadius: 8, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Shield size={14} color="white" />
             </div>
             <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>Admin Panel</span>
           </div>
-          <button onClick={() => setMenuOpen(true)} style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)' }}>
-            <Menu size={18} />
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={toggleTheme} style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <button onClick={() => setMenuOpen(true)} style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+              <Menu size={18} />
+            </button>
+          </div>
         </header>
 
         <AnimatePresence>
@@ -138,11 +145,17 @@ export default function AdminLayout() {
         </nav>
 
         <div style={{ padding: '14px 16px', borderTop: '1px solid var(--border)' }}>
-          <button onClick={() => logout.mutate()} disabled={logout.isPending}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent-danger)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, marginBottom: 14, padding: 0, transition: 'opacity 0.15s', opacity: logout.isPending ? 0.6 : 1 }}>
-            <LogOut size={13} />
-            {logout.isPending ? 'Logging out…' : 'Logout'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <button onClick={() => logout.mutate()} disabled={logout.isPending}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent-danger)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0, transition: 'opacity 0.15s', opacity: logout.isPending ? 0.6 : 1 }}>
+              <LogOut size={13} />
+              {logout.isPending ? 'Logging out…' : 'Logout'}
+            </button>
+            <button onClick={toggleTheme} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              style={{ width: 30, height: 30, borderRadius: 7, border: '1px solid var(--border)', background: 'var(--bg-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)', flexShrink: 0 }}>
+              {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
+            </button>
+          </div>
           <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, fontFamily: 'Space Grotesk', marginBottom: 2 }}>{user?.name}</div>
           <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600 }}>Administrator</div>
         </div>

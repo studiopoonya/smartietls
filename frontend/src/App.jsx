@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useAppStore } from './store/useAppStore';
 import AppLayout from './layouts/AppLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -34,6 +34,14 @@ const queryClient = new QueryClient({
   },
 });
 
+function ThemeApplier() {
+  const theme = useAppStore(s => s.theme);
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme ?? 'dark');
+  }, [theme]);
+  return null;
+}
+
 function PageLoader() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)' }}>
@@ -62,6 +70,7 @@ function AdminGuard({ children }) {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeApplier />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <Routes>

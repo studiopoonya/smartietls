@@ -20,6 +20,22 @@
   --border-glow: rgba(124, 58, 237, 0.4);
   --glow-purple: rgba(124, 58, 237, 0.15);
   --glow-cyan: rgba(6, 182, 212, 0.15);
+  --header-bg: rgba(17, 17, 24, 0.92);
+}
+
+[data-theme="light"] {
+  --bg-primary: #F5F7FA;
+  --bg-secondary: #ECEEF3;
+  --bg-elevated: #E2E6EE;
+  --bg-card: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #D1D9E6;
+  --border-glow: rgba(124, 58, 237, 0.3);
+  --glow-purple: rgba(124, 58, 237, 0.08);
+  --glow-cyan: rgba(6, 182, 212, 0.08);
+  --header-bg: rgba(245, 247, 250, 0.92);
 }
 
 * {
