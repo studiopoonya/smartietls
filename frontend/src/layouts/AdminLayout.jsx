@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Users, LogOut, Shield, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Shield, Menu, X, Settings } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import { useLogout } from '../hooks/useAuth';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -10,6 +10,7 @@ import logo from '../assets/logo-removebg-preview.png';
 const NAV = [
   { to: '/admin', end: true, icon: LayoutDashboard, label: 'Overview' },
   { to: '/admin/users',      icon: Users,           label: 'Users' },
+  { to: '/setup',            icon: Settings,        label: 'API Key Setup' },
 ];
 
 export default function AdminLayout() {
