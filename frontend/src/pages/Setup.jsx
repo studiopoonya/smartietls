@@ -8,7 +8,6 @@ import { useIsMobile } from '../hooks/useIsMobile';
 
 export default function Setup() {
   const [apiKey, setApiKey] = useState('');
-  const [targetBand, setTargetBand] = useState(7);
   const [examDate, setExamDate] = useState('');
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -33,9 +32,9 @@ export default function Setup() {
     setSaving(true);
     try {
       await api.post('/user/api-key', { api_key: apiKey });
-      await api.put('/user/profile', { target_band: targetBand, ...(examDate ? { exam_date: examDate } : {}) });
-      updateUser({ has_api_key: true, target_band: targetBand, exam_date: examDate || null });
-      navigate('/dashboard');
+      if (examDate) await api.put('/user/profile', { exam_date: examDate });
+      updateUser({ has_api_key: true });
+      navigate('/admin');
     } catch (e) {
       setTestResult({ ok: false, msg: e.response?.data?.message || 'Failed to save API key' });
     } finally { setSaving(false); }
@@ -94,18 +93,6 @@ export default function Setup() {
           )}
 
           <div style={{ marginBottom: 22 }}>
-            <label style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 10, fontWeight: 500 }}>Target Band Score</label>
-            <div style={{ display: 'flex', gap: isMobile ? 7 : 8, flexWrap: 'wrap' }}>
-              {[5, 6, 6.5, 7, 7.5, 8, 9].map(b => (
-                <button key={b} onClick={() => setTargetBand(b)}
-                  style={{ padding: isMobile ? '9px 13px' : '8px 16px', borderRadius: 8, border: `1px solid ${targetBand === b ? 'var(--accent-primary)' : 'var(--border)'}`, background: targetBand === b ? 'rgba(124,58,237,0.2)' : 'var(--bg-elevated)', color: targetBand === b ? 'var(--accent-glow)' : 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'Space Mono', fontSize: isMobile ? 13 : 14, fontWeight: 700, transition: 'all 0.2s' }}>
-                  {b}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 22 }}>
             <label style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 500 }}>
               IELTS Exam Date <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
             </label>
@@ -131,7 +118,7 @@ export default function Setup() {
           )}
           <button className="btn-primary" onClick={handleSave} disabled={!apiKey || saving}
             style={{ width: '100%', padding: isMobile ? '15px' : '16px', fontSize: isMobile ? 16 : 17, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: testResult?.ok ? '0 0 24px rgba(124,58,237,0.5)' : 'none' }}>
-            {saving ? 'Saving...' : <><span>Start Learning</span><ArrowRight size={18} /></>}
+            {saving ? 'Saving...' : <><span>Save API Key</span><ArrowRight size={18} /></>}
           </button>
         </div>
 

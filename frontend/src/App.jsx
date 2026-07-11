@@ -15,6 +15,8 @@ const Writing = lazy(() => import('./pages/learn/Writing'));
 const Speaking = lazy(() => import('./pages/learn/Speaking'));
 const Reading = lazy(() => import('./pages/learn/Reading'));
 const Listening = lazy(() => import('./pages/learn/Listening'));
+const CurriculumPage = lazy(() => import('./pages/learn/CurriculumPage'));
+const LessonView = lazy(() => import('./pages/learn/LessonView'));
 const MockTest = lazy(() => import('./pages/MockTest'));
 const Vocabulary    = lazy(() => import('./pages/Vocabulary'));
 const Progress      = lazy(() => import('./pages/Progress'));
@@ -70,24 +72,24 @@ export default function App() {
             </Route>
             <Route element={<Protected><AppLayout /></Protected>}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/learn/writing" element={<Writing />} />
-              <Route path="/learn/speaking" element={<Speaking />} />
-              <Route path="/learn/reading" element={<Reading />} />
-              <Route path="/learn/listening" element={<Listening />} />
+              <Route path="/learn/:skill" element={<CurriculumPage />} />
+              <Route path="/learn/:skill/lesson/:lessonId" element={<LessonView />} />
+              <Route path="/learn/writing/practice" element={<Writing />} />
+              <Route path="/learn/speaking/practice" element={<Speaking />} />
+              <Route path="/learn/reading/practice" element={<Reading />} />
+              <Route path="/learn/listening/practice" element={<Listening />} />
               <Route path="/mock-test" element={<MockTest />} />
               <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/progress" element={<Progress />} />
               <Route path="/tips" element={<Tips />} />
               <Route path="/scholarships" element={<Scholarships />} />
             </Route>
-            <Route element={<AdminGuard><AppLayout /></AdminGuard>}>
-              <Route path="/setup" element={<Setup />} />
-            </Route>
             <Route element={<AdminGuard><AdminLayout /></AdminGuard>}>
               <Route path="/admin" element={<AdminOverview />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/users/:id" element={<AdminUserDetail />} />
               <Route path="/admin/users/:id/progress" element={<AdminUserProgress />} />
+              <Route path="/setup" element={<Setup />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
