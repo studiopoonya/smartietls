@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lightbulb, PenLine, Mic2, BookOpen, Headphones, Star, AlertCircle, Clock, CheckCircle2, Flame, Target, Hash, RefreshCw, Globe } from 'lucide-react';
+import { Lightbulb, PenLine, Mic2, BookOpen, Headphones, Star, AlertCircle, Clock, CheckCircle2, Flame, Target, Hash, RefreshCw, Globe, Heart, Zap, Coffee, Trophy, Shield, Smile } from 'lucide-react';
 import { useIsMobile } from '../hooks/useIsMobile';
 import GlowCard from '../components/common/GlowCard';
 
 const SECTIONS = [
   { id: 'all',       label: 'All',       color: '#7C3AED' },
+  { id: 'mindset',   label: 'Mindset',   color: '#EC4899', icon: Heart },
   { id: 'writing',   label: 'Writing',   color: '#7C3AED', icon: PenLine },
   { id: 'speaking',  label: 'Speaking',  color: '#06B6D4', icon: Mic2 },
   { id: 'reading',   label: 'Reading',   color: '#10B981', icon: BookOpen },
@@ -14,6 +15,16 @@ const SECTIONS = [
 ];
 
 const TIPS = [
+  /* ── Mindset ── */
+  { section: 'mindset', icon: Zap, level: 'essential', title: 'Start with just 5 minutes', body: 'Rasa takut belajar sering bukan soal materinya — tapi soal mulainya. Commit ke 5 menit saja. Begitu mulai, kamu biasanya langsung lanjut. "I\'ll just do 5 minutes" adalah trick paling powerful untuk beat procrastination.' },
+  { section: 'mindset', icon: Shield, level: 'essential', title: 'Takut itu tanda kamu peduli', body: 'Anxiety sebelum belajar itu normal — artinya kamu serius. Orang yang nggak peduli nggak pernah takut gagal. Reframe: rasa takut itu bahan bakar, bukan alasan berhenti. Acknowledge it, then open the app anyway.' },
+  { section: 'mindset', icon: Trophy, level: 'essential', title: 'Progress, bukan perfection', body: 'Kamu nggak harus ngerti 100% sebelum lanjut. Lesson yang selesai 80% jauh lebih baik daripada lesson yang nggak pernah dimulai karena nunggu "siap". Done beats perfect every single time.' },
+  { section: 'mindset', icon: Coffee, level: 'tip', title: 'Belajar setelah ritual kecil', body: 'Attach sesi belajar ke kebiasaan yang udah ada — setelah sarapan, setelah ngopi pagi, atau setelah mandi. Otak lebih gampang masuk mode fokus kalau ada "anchor" yang konsisten.' },
+  { section: 'mindset', icon: Smile, level: 'tip', title: 'Rayakan progress kecil', body: 'Selesain satu lesson? Itu pencapaian nyata. Selesain satu sesi practice? Worth celebrating. Dopamine dari small wins ngebantu otak associate belajar dengan sesuatu yang positif, bukan menyiksa.' },
+  { section: 'mindset', icon: Heart, level: 'tip', title: 'Jangan bandingin dirimu dengan orang lain', body: 'Progress IELTS tiap orang beda — tergantung background, waktu tersedia, dan kondisi hidup. Yang penting kamu lebih baik dari kemarin. Compare yourself to who you were yesterday, not to others today.' },
+  { section: 'mindset', icon: Target, level: 'tip', title: 'Ingat KENAPA kamu belajar ini', body: 'Di hari-hari yang berat, balik ke tujuan awal — universitas impian, karir, atau negara yang ingin kamu tinggali. Tujuan yang kuat adalah bensin yang tetap bisa nyalain api bahkan ketika motivasi sedang rendah.' },
+  { section: 'mindset', icon: Flame, level: 'tip', title: 'Konsistensi mengalahkan intensitas', body: '15 menit setiap hari mengalahkan 3 jam seminggu sekali. Otak belajar lebih efektif lewat repetisi kecil yang konsisten (spaced repetition). Kamu nggak butuh study marathon — kamu butuh kebiasaan yang bisa dipertahankan.' },
+
   /* ── Writing ── */
   { section: 'writing', icon: Clock, level: 'essential', title: 'Plan before you write', body: 'Spend 5 minutes planning your essay. A clear structure (introduction → body → conclusion) scores higher than a longer but unorganized response.' },
   { section: 'writing', icon: Hash, level: 'essential', title: 'Hit the minimum word count', body: 'Task 1: minimum 150 words. Task 2: minimum 250 words. Going under loses marks immediately. Going over is fine but wastes time.' },
@@ -56,8 +67,8 @@ const TIPS = [
 ];
 
 const SECTION_COLORS = {
-  writing: '#7C3AED', speaking: '#06B6D4', reading: '#10B981',
-  listening: '#F59E0B', general: '#EC4899',
+  mindset: '#EC4899', writing: '#7C3AED', speaking: '#06B6D4',
+  reading: '#10B981', listening: '#F59E0B', general: '#EC4899',
 };
 
 export default function Tips() {
@@ -79,7 +90,7 @@ export default function Tips() {
           </div>
           <h1 style={{ fontSize: isMobile ? 20 : 26 }}>Tips & Tricks</h1>
         </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Expert strategies to boost your IELTS band score</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Expert strategies, mindset tips, and study habits to help you reach your target band</p>
       </motion.div>
 
       {/* Section tabs */}
@@ -97,6 +108,20 @@ export default function Tips() {
           </button>
         ))}
       </div>
+
+      {/* Mindset banner */}
+      {(active === 'mindset' || active === 'all') && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          style={{ marginBottom: 20, padding: '16px 20px', borderRadius: 14, background: 'linear-gradient(135deg, rgba(236,72,153,0.12), rgba(124,58,237,0.08))', border: '1px solid rgba(236,72,153,0.25)', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(236,72,153,0.15)', border: '1px solid rgba(236,72,153,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Heart size={18} style={{ color: '#EC4899' }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--text-primary)', marginBottom: 3 }}>Kamu sudah di sini — itu sudah setengah jalan.</div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>Rasa takut belajar dirasakan hampir semua orang. Tips di bawah ini bukan tentang IELTS — tapi tentang cara membuatnya terasa lebih ringan.</div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Essentials */}
       {essentials.length > 0 && (
