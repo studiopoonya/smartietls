@@ -440,9 +440,16 @@ export default function Vocabulary() {
                   {/* Part of speech */}
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: 4 }}>{v.definition_data?.partOfSpeech}</div>
                   {/* Definition — 2 lines max */}
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: v.definition_data?.synonyms?.length ? 8 : 0 }}>
                     {v.definition_data?.definition}
                   </div>
+                  {v.definition_data?.synonyms?.length > 0 && (
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                      {v.definition_data.synonyms.slice(0, 3).map((s, i) => (
+                        <span key={i} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: 'rgba(124,58,237,0.12)', color: 'var(--accent-glow)', border: '1px solid rgba(124,58,237,0.2)', fontWeight: 500 }}>{s}</span>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ) : (
                 <motion.div key={v.id} className="glow-card" style={{ padding: 16 }} whileHover={{ y: -2 }}>
@@ -453,9 +460,16 @@ export default function Vocabulary() {
                     </div>
                     <span className="badge badge-purple" style={{ fontSize: 9 }}>{v.definition_data?.bandLevel}</span>
                   </div>
-                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 10 }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: v.definition_data?.synonyms?.length ? 8 : 10 }}>
                     {v.definition_data?.definition?.slice(0, 90)}{v.definition_data?.definition?.length > 90 ? '...' : ''}
                   </p>
+                  {v.definition_data?.synonyms?.length > 0 && (
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
+                      {v.definition_data.synonyms.slice(0, 3).map((s, i) => (
+                        <span key={i} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: 'rgba(124,58,237,0.12)', color: 'var(--accent-glow)', border: '1px solid rgba(124,58,237,0.2)', fontWeight: 500 }}>{s}</span>
+                      ))}
+                    </div>
+                  )}
                   <div style={{ display: 'flex', gap: 7 }}>
                     <button onClick={() => reviewMutation.mutate(v.id)} style={{ flex: 1, padding: '6px', borderRadius: 7, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-success)', cursor: 'pointer', fontSize: 10, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
                       <RefreshCw size={10} /> Done ({v.review_count})
