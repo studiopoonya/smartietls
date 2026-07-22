@@ -23,8 +23,8 @@ export default function Landing() {
           <img src={logo} alt="Smart IELTS" style={{ height: 38, objectFit: 'contain' }} />
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Link to="/login" style={{ padding: '9px 20px', borderRadius: 10, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 14, fontWeight: 500, fontFamily: 'Space Grotesk', transition: 'all 0.2s' }}>Log in</Link>
           <Link to="/register" style={{ padding: '9px 20px', borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'Space Grotesk', boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}>Get Started</Link>
+          <Link to="/login" style={{ padding: '9px 20px', borderRadius: 10, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 14, fontWeight: 500, fontFamily: 'Space Grotesk', transition: 'all 0.2s' }}>Log in</Link>
         </div>
       </nav>
 

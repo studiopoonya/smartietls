@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AI\AIListeningController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\StudyPlanController;
 use App\Http\Controllers\AI\AIMockTestController;
 use App\Http\Controllers\AI\AIReadingController;
 use App\Http\Controllers\AI\AISpeakingController;
@@ -39,6 +40,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Lesson progress
     Route::get('/lessons/progress', [LessonController::class, 'progress']);
     Route::post('/lessons/{lessonId}/complete', [LessonController::class, 'complete']);
+
+    // Study plan
+    Route::get('/study-plan', [StudyPlanController::class, 'show']);
+    Route::post('/study-plan', [StudyPlanController::class, 'store']);
 
     // Levels (per-module difficulty unlock progression)
     Route::get('/levels', [LevelController::class, 'index']);

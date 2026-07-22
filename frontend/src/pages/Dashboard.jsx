@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, Flame, Target, AlertCircle, Clock, CalendarDays } from 'lucide-react';
+import { PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, Flame, Target, AlertCircle, Clock, CalendarDays, Zap, CheckCircle } from 'lucide-react';
 import { useDashboard } from '../hooks/useProgress';
+import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '../store/useAppStore';
+import api from '../lib/axios';
 import { useIsMobile } from '../hooks/useIsMobile';
 import GlowCard from '../components/common/GlowCard';
 import BandScoreBar from '../components/common/BandScoreBar';
@@ -25,6 +27,11 @@ export default function Dashboard() {
   const { data, isLoading } = useDashboard();
   const storeUser = useAppStore(s => s.user);
   const isMobile = useIsMobile();
+  const { data: planData } = useQuery({
+    queryKey: ['study-plan'],
+    queryFn: () => api.get('/study-plan').then(r => r.data.plan),
+    enabled: !!storeUser?.study_weeks,
+  });
   const pad = isMobile ? '20px 16px' : '36px 40px';
 
   if (isLoading) return (
@@ -82,6 +89,40 @@ export default function Dashboard() {
             <div style={{ fontSize: 13, fontWeight: 600, color: '#F59E0B', marginBottom: 3 }}>API key not configured</div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
               <Link to="/setup" style={{ color: 'var(--accent-secondary)', textDecoration: 'none', fontWeight: 600 }}>Set up your Anthropic API key →</Link>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Study plan banner */}
+      {planData && (
+        <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+          style={{ marginBottom: 20, padding: '16px 20px', borderRadius: 14, background: planData.on_track ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)', border: `1px solid ${planData.on_track ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: planData.on_track ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {planData.finished ? <CheckCircle size={18} style={{ color: 'var(--accent-success)' }} /> : planData.on_track ? <Zap size={18} style={{ color: 'var(--accent-success)' }} /> : <Flame size={18} style={{ color: '#F59E0B' }} />}
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  {planData.finished ? '🎉 All lessons complete!' : `Day ${planData.day_number} of ${planData.total_days} — ${storeUser?.study_weeks}-Week Plan`}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  {planData.finished
+                    ? 'Try the Mock Test to test your full band score.'
+                    : planData.on_track
+                      ? `On track! ${planData.completed_lessons}/${planData.total_lessons} lessons done.`
+                      : `${planData.expected_lessons - planData.completed_lessons} lesson(s) behind — let's catch up today!`}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, minWidth: 100 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Space Mono' }}>
+                {planData.completed_lessons}/{planData.total_lessons} lessons
+              </div>
+              <div style={{ width: 100, height: 5, background: 'var(--border)', borderRadius: 99, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.round(planData.completed_lessons / planData.total_lessons * 100)}%`, background: planData.on_track ? 'var(--accent-success)' : '#F59E0B', borderRadius: 99, transition: 'width 0.5s' }} />
+              </div>
             </div>
           </div>
         </motion.div>

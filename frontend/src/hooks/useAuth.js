@@ -12,7 +12,7 @@ export function useLogin() {
     onSuccess: ({ user, token }) => {
       localStorage.setItem('auth_token', token);
       setUser(user);
-      navigate(user.is_admin ? '/admin' : '/dashboard');
+      navigate(user.is_admin ? '/admin' : (user.study_weeks ? '/dashboard' : '/onboarding'));
     },
   });
 }
@@ -26,7 +26,7 @@ export function useRegister() {
     onSuccess: ({ user, token }) => {
       localStorage.setItem('auth_token', token);
       setUser(user);
-      navigate(user.is_admin ? '/admin' : '/dashboard');
+      navigate(user.is_admin ? '/admin' : '/onboarding');
     },
   });
 }

@@ -22,6 +22,7 @@ const Vocabulary    = lazy(() => import('./pages/Vocabulary'));
 const Progress      = lazy(() => import('./pages/Progress'));
 const Tips            = lazy(() => import('./pages/Tips'));
 const Scholarships    = lazy(() => import('./pages/Scholarships'));
+const Onboarding        = lazy(() => import('./pages/Onboarding'));
 const AdminOverview     = lazy(() => import('./pages/admin/AdminOverview'));
 const AdminUsers        = lazy(() => import('./pages/admin/AdminUsers'));
 const AdminUserDetail   = lazy(() => import('./pages/admin/AdminUserDetail'));
@@ -56,6 +57,13 @@ function Protected({ children }) {
   const user = useAppStore(s => s.user);
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.is_admin) return <Navigate to="/admin" replace />;
+  if (!user?.study_weeks) return <Navigate to="/onboarding" replace />;
+  return children;
+}
+
+function AuthRequired({ children }) {
+  const isAuthenticated = useAppStore(s => s.isAuthenticated);
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   return children;
 }
 
@@ -78,6 +86,9 @@ export default function App() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+            </Route>
+            <Route element={<AuthRequired />}>
+              <Route path="/onboarding" element={<Onboarding />} />
             </Route>
             <Route element={<Protected><AppLayout /></Protected>}>
               <Route path="/dashboard" element={<Dashboard />} />
