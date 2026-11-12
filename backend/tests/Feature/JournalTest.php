@@ -67,7 +67,79 @@ XML;
         $this->assertSame('Sleep and study', $response->json('results.0.title'));
         $this->assertSame('Background Sleep matters for students.', $response->json('results.0.snippet'));
         $this->assertNull($response->json('nextCursor'));
-        Http::assertSent(fn ($request) => str_contains(urldecode($request->url()), '(sleep students) AND OPEN_ACCESS:y'));
+        Http::assertSent(fn ($request) => str_contains(urldecode($request->url()), '(TITLE:"sleep students" OR ABSTRACT:"sleep students") AND OPEN_ACCESS:y'));
+    }
+
+    public function test_sort_options_reach_europe_pmc_and_pages_keep_their_match_mode(): void
+    {
+        $page = array_map(fn ($i) => $this->record("PMC{$i}", 'cc by'), range(1, 10));
+        $this->fakeEuropePmc($page);
+
+        $popular = $this->getJson('/api/journals?q=online+learning&sort=popular')->assertOk();
+        Http::assertSent(fn ($r) => str_contains(urldecode($r->url()), 'sort=CITED desc') && str_contains(urldecode($r->url()), 'TITLE:"online learning" AND'));
+        $this->assertSame('title:AoE', $popular->json('nextCursor'));
+
+        // Page two keeps the title-only match instead of starting over.
+        $this->getJson('/api/journals?q=online+learning&sort=popular&cursor=' . urlencode('title:AoE'))->assertOk();
+        Http::assertSent(fn ($r) => str_contains(urldecode($r->url()), 'cursorMark=AoE') && str_contains(urldecode($r->url()), 'TITLE:"online learning" AND'));
+
+        $this->getJson('/api/journals?q=online+learning&sort=latest')->assertOk();
+        Http::assertSent(fn ($r) => str_contains(urldecode($r->url()), 'sort=FIRST_PDATE_D desc'));
+
+        $this->getJson('/api/journals?q=online+learning&sort=random')->assertStatus(422);
+    }
+
+    public function test_a_strict_match_with_only_a_few_hits_gives_way_to_a_broader_one(): void
+    {
+        Http::swap(new \Illuminate\Http\Client\Factory);
+        Http::fake(function ($request) {
+            $url = urldecode($request->url());
+            $hits = str_contains($url, 'TITLE:(sleep AND students') ? 300 : (str_contains($url, 'ABSTRACT:"sleep students"') ? 40 : 2);
+            return Http::response(['hitCount' => $hits, 'nextCursorMark' => 'N', 'resultList' => ['result' => [$this->record('PMC' . $hits, 'cc by')]]]);
+        });
+
+        // Title-only finds 2, so it is not kept; the title-or-abstract phrase finds 40, which is enough.
+        $this->getJson('/api/journals?q=sleep+students&sort=popular')->assertOk()->assertJsonPath('total', 40)->assertJsonPath('results.0.id', 'PMC40');
+        Http::assertSentCount(2);
+    }
+
+    public function test_hyphens_and_apostrophes_never_become_operators(): void
+    {
+        Http::swap(new \Illuminate\Http\Client\Factory);
+        Http::fake(fn () => Http::response(['hitCount' => 0, 'resultList' => ['result' => []]]));
+
+        $this->getJson('/api/journals?q=' . urlencode("self - efficacy covid -19 students'"))->assertOk();
+
+        Http::assertSent(fn ($r) => str_contains(urldecode($r->url()), 'TITLE:(self AND efficacy AND covid AND 19 AND students)'));
+        Http::assertNotSent(fn ($r) => str_contains(urldecode($r->url()), 'AND -'));
+    }
+
+    public function test_ahead_of_print_articles_are_not_cut_off_by_date(): void
+    {
+        $this->fakeEuropePmc([$this->record('PMC1', 'cc by')]);
+        $this->getJson('/api/journals?q=sleep&sort=latest')->assertOk();
+
+        Http::assertSent(fn ($r) => str_contains(urldecode($r->url()), 'FIRST_PDATE:[2015-01-01 TO 2100-12-31]'));
+    }
+
+    public function test_a_cursor_from_before_match_modes_ends_the_list_instead_of_repeating_page_one(): void
+    {
+        $this->fakeEuropePmc([$this->record('PMC1', 'cc by')]);
+
+        $this->getJson('/api/journals?q=sleep&cursor=AoIIP4oldstyle')->assertOk()->assertJson(['results' => [], 'nextCursor' => null]);
+        Http::assertNothingSent();
+    }
+
+    public function test_a_strict_match_with_no_hits_falls_back_to_a_looser_one(): void
+    {
+        Http::swap(new \Illuminate\Http\Client\Factory);
+        Http::fake(function ($request) {
+            $loose = str_contains(urldecode($request->url()), 'TITLE:(online AND learning');
+            return Http::response(['hitCount' => $loose ? 1 : 0, 'resultList' => ['result' => $loose ? [$this->record('PMC7', 'cc by')] : []]]);
+        });
+
+        $this->getJson('/api/journals?q=online+learning')->assertOk()->assertJsonPath('results.0.id', 'PMC7')->assertJsonPath('total', 1);
+        Http::assertSentCount(2);
     }
 
     public function test_article_is_split_into_readable_sections(): void
@@ -142,7 +214,9 @@ XML;
         $this->fakeEuropePmc([$this->record('PMC1', 'cc by')]);
         $this->getJson('/api/journals?q=sleep')->assertOk();
 
-        Cache::forget('journals:search:' . sha1('sleep|*'));
+        $key = 'journals:search:' . sha1('sleep|relevant|*');
+        $this->assertTrue(Cache::has($key), 'The fresh answer is cached under this key.');
+        Cache::forget($key);
         $this->fakeEuropePmc([], 503);
         $this->getJson('/api/journals?q=sleep')->assertOk()->assertJsonPath('results.0.id', 'PMC1');
 

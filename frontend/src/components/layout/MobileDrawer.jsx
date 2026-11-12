@@ -1,27 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Settings, Lightbulb, GraduationCap, Map, RotateCcw, Library, SpellCheck } from 'lucide-react';
+import { X, LogOut, Settings } from 'lucide-react';
+import { NAV_ITEMS } from './navItems';
 import { useAppStore } from '../../store/useAppStore';
 import { useLogout } from '../../hooks/useAuth';
 import logo from '../../assets/logo-removebg-preview.png';
 
+// Same order as the desktop sidebar, plus the admin-only settings link.
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { label: 'LEARN', isHeader: true },
-  { to: '/learn', end: true, icon: Map, label: 'Learning Path' },
-  { to: '/learn/writing', icon: PenLine, label: 'Writing' },
-  { to: '/learn/speaking', icon: Mic2, label: 'Speaking' },
-  { to: '/learn/reading', icon: BookOpen, label: 'Reading' },
-  { to: '/learn/listening', icon: Headphones, label: 'Listening' },
-  { to: '/grammar', icon: SpellCheck, label: 'Grammar Lab' },
-  { label: 'TOOLS', isHeader: true },
-  { to: '/error-bank', icon: RotateCcw, label: 'Error Bank' },
-  { to: '/mock-test', icon: FlaskConical, label: 'Exam Simulation' },
-  { to: '/vocabulary', icon: BookMarked, label: 'Vocabulary' },
-  { to: '/journals', icon: Library, label: 'Journals' },
-  { to: '/progress', icon: TrendingUp, label: 'Progress' },
-  { to: '/tips', icon: Lightbulb, label: 'Tips & Tricks' },
-  { to: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
+  ...NAV_ITEMS,
   { to: '/setup', icon: Settings, label: 'API Key Settings', adminOnly: true },
 ];
 
@@ -93,7 +80,7 @@ export default function MobileDrawer({ open, onClose }) {
 
             {/* Logout */}
             <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)' }}>
-              <button onClick={() => { logout(); onClose(); }} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, border: 'none', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', color: 'var(--accent-danger)', cursor: 'pointer', fontSize: 14, fontWeight: 500, width: '100%' }}>
+              <button onClick={() => { logout(); onClose(); }} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 10, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)', color: 'var(--accent-danger)', cursor: 'pointer', fontSize: 14, fontWeight: 500, width: '100%' }}>
                 <LogOut size={16} /> Log out
               </button>
             </div>

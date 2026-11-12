@@ -16,6 +16,7 @@ class JournalController extends Controller
         $data = $request->validate([
             'q'      => 'required|string|min:2|max:120',
             'cursor' => 'nullable|string|max:200',
+            'sort'   => 'nullable|in:' . implode(',', JournalLibrary::SORTS),
         ]);
 
         // The query goes into a Europe PMC search, so its field syntax is removed.
@@ -24,8 +25,12 @@ class JournalController extends Controller
             return response()->json(['message' => 'Please type a topic to search for.'], 422);
         }
 
+        // A slow Europe PMC plus a fallback match can pass PHP's default 30-second limit, which would end
+        // in a fatal error the friendly 502 below cannot catch.
+        set_time_limit(90);
+
         try {
-            return response()->json($this->library->search($query, $data['cursor'] ?? '*'));
+            return response()->json($this->library->search($query, $data['cursor'] ?? '*', $data['sort'] ?? 'relevant'));
         } catch (\Exception $e) {
             Log::warning('Journal search failed: ' . $e->getMessage());
             return response()->json(['message' => 'The journal library is not responding. Please try again in a moment.'], 502);
@@ -35,6 +40,7 @@ class JournalController extends Controller
     public function show(string $id): JsonResponse
     {
         abort_unless(preg_match('/^PMC\d{1,10}$/', $id), 404);
+        set_time_limit(90);
 
         try {
             $article = $this->library->article($id);

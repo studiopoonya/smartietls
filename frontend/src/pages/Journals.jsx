@@ -5,6 +5,12 @@ import { Library, Loader2, Search } from 'lucide-react';
 import { useJournalSearch } from '../hooks/useJournals';
 import { useIsMobile } from '../hooks/useIsMobile';
 
+const SORTS = [
+  ['relevant', 'Relevant', 'Best match for your topic'],
+  ['popular', 'Most cited', 'Papers other researchers cite the most'],
+  ['latest', 'Latest', 'Newest papers first'],
+];
+
 const TOPICS = ['Higher education', 'Public health', 'Climate change', 'Artificial intelligence', 'Mental health', 'Urban planning', 'Nutrition', 'Economic inequality'];
 const errorMessage = (err) => err?.response?.data?.message ?? 'Something went wrong. Please try again.';
 
@@ -15,7 +21,12 @@ function ArticleCard({ article }) {
         {[article.journal, article.year].filter(Boolean).join(' · ')}
       </div>
       <h2 style={{ fontSize: 16, fontFamily: 'var(--font-display)', color: 'var(--text-primary)', lineHeight: 1.35, marginBottom: 4 }}>{article.title}</h2>
-      {article.authors && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{article.authors}</div>}
+      {(article.authors || article.citedBy > 0) && (
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+          {article.authors}
+          {article.citedBy > 0 && <span style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>{article.authors ? ' · ' : ''}Cited {article.citedBy.toLocaleString('en-US')}×</span>}
+        </div>
+      )}
       {article.snippet && <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{article.snippet}</p>}
       <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)' }}>Read article →</div>
     </Link>
@@ -26,16 +37,18 @@ export default function Journals() {
   const isMobile = useIsMobile();
   const [params, setParams] = useSearchParams();
   const query = params.get('q') ?? '';
+  const sort = SORTS.some(([id]) => id === params.get('sort')) ? params.get('sort') : 'relevant';
   const [draft, setDraft] = useState(query);
-  const search = useJournalSearch(query);
+  const search = useJournalSearch(query, sort);
   const results = search.data?.pages.flatMap(page => page.results) ?? [];
   const total = search.data?.pages[0]?.total ?? 0;
 
   const run = (value) => {
     const q = value.trim();
     setDraft(q);
-    setParams(q ? { q } : {});
+    setParams(q ? { q, ...(sort !== 'relevant' && { sort }) } : {});
   };
+  const setSort = (value) => setParams({ q: query, ...(value !== 'relevant' && { sort: value }) }, { replace: true });
 
   return (
     <div style={{ padding: isMobile ? '20px 16px' : '36px 40px', maxWidth: 820, margin: '0 auto' }}>
@@ -54,9 +67,9 @@ export default function Journals() {
         </button>
       </form>
 
-      <div className="chip-row" style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+      <div className="chip-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 20 }}>
         {TOPICS.map(topic => (
-          <button key={topic} type="button" data-compact onClick={() => run(topic)} aria-pressed={query === topic} style={{ padding: '6px 12px', borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: `1px solid ${query === topic ? 'var(--accent-secondary)' : 'var(--border)'}`, background: query === topic ? 'color-mix(in srgb, var(--accent-secondary) 14%, transparent)' : 'var(--bg-card)', color: query === topic ? 'var(--accent-secondary)' : 'var(--text-secondary)' }}>{topic}</button>
+          <button key={topic} type="button" data-compact onClick={() => run(topic)} aria-pressed={query === topic} style={{ padding: '6px 12px', whiteSpace: 'nowrap', borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: `1px solid ${query === topic ? 'var(--accent-secondary)' : 'var(--border)'}`, background: query === topic ? 'color-mix(in srgb, var(--accent-secondary) 14%, transparent)' : 'var(--bg-card)', color: query === topic ? 'var(--accent-secondary)' : 'var(--text-secondary)' }}>{topic}</button>
         ))}
       </div>
 
@@ -85,12 +98,21 @@ export default function Journals() {
           <div style={{ padding: 18, borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', fontSize: 14, color: 'var(--text-secondary)' }}>No open-access articles found for “{query}”. Try a broader or different wording.</div>
         ) : (
           <>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 10 }}>About {total.toLocaleString('en-US')} articles for “{query}”</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                {search.isPlaceholderData ? <><Loader2 size={13} style={{ animation: 'spin 0.8s linear infinite' }} /> Sorting…</> : `About ${total.toLocaleString('en-US')} articles for “${query}”`}
+              </div>
+              <div role="radiogroup" aria-label="Sort articles" style={{ display: 'inline-flex', padding: 3, borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                {SORTS.map(([id, label, hint]) => (
+                  <button key={id} type="button" role="radio" data-compact aria-checked={sort === id} title={hint} onClick={() => setSort(id)} style={{ padding: '6px 12px', borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer', border: 'none', background: sort === id ? 'var(--accent-primary)' : 'transparent', color: sort === id ? 'white' : 'var(--text-secondary)' }}>{label}</button>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, opacity: search.isPlaceholderData ? 0.55 : 1, transition: 'opacity 0.2s' }}>
               {results.map(article => <ArticleCard key={article.id} article={article} />)}
             </div>
-            {search.hasNextPage && (
-              <button type="button" className="btn-secondary" disabled={search.isFetchingNextPage} onClick={() => search.fetchNextPage()} style={{ display: 'block', margin: '16px auto 0', padding: '10px 20px', fontSize: 14 }}>
+            {search.hasNextPage && !search.isPlaceholderData && (
+              <button type="button" className="btn-secondary" disabled={search.isFetchingNextPage}onClick={() => search.fetchNextPage()} style={{ display: 'block', margin: '16px auto 0', padding: '10px 20px', fontSize: 14 }}>
                 {search.isFetchingNextPage ? 'Loading…' : 'Show more articles'}
               </button>
             )}

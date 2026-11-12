@@ -1,28 +1,10 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Flame, Target, Lightbulb, GraduationCap, Sun, Moon, Map, RotateCcw, Library, SpellCheck } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { LogOut, Flame, Target, Sun, Moon } from 'lucide-react';
+import { NAV_ITEMS } from './navItems';
 import { useAppStore } from '../../store/useAppStore';
 import { useLogout } from '../../hooks/useAuth';
 import logo from '../../assets/logo-removebg-preview.png';
 
-const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { label: 'LEARN', isHeader: true },
-  { to: '/learn', end: true, icon: Map, label: 'Learning Path' },
-  { to: '/learn/writing', icon: PenLine, label: 'Writing' },
-  { to: '/learn/speaking', icon: Mic2, label: 'Speaking' },
-  { to: '/learn/reading', icon: BookOpen, label: 'Reading' },
-  { to: '/learn/listening', icon: Headphones, label: 'Listening' },
-  { to: '/grammar', icon: SpellCheck, label: 'Grammar Lab' },
-  { label: 'TOOLS', isHeader: true },
-  { to: '/error-bank', icon: RotateCcw, label: 'Error Bank' },
-  { to: '/mock-test', icon: FlaskConical, label: 'Exam Simulation' },
-  { to: '/vocabulary', icon: BookMarked, label: 'Vocabulary' },
-  { to: '/journals', icon: Library, label: 'Journals' },
-  { to: '/progress', icon: TrendingUp, label: 'Progress' },
-  { to: '/tips', icon: Lightbulb, label: 'Tips & Tricks' },
-  { to: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
-];
 
 export default function Sidebar() {
   const user = useAppStore(s => s.user);
@@ -44,7 +26,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '12px 12px' }}>
-        {navItems.map((item, i) => {
+        {NAV_ITEMS.map((item, i) => {
           if (item.isHeader) return (
             <div key={i} style={{ padding: '16px 8px 6px', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: 'var(--font-display)' }}>{item.label}</div>
           );

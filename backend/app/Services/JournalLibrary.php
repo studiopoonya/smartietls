@@ -49,19 +49,79 @@ class JournalLibrary
         return $value;
     }
 
-    public function search(string $query, string $cursor = '*'): array
+    public const SORTS = ['relevant', 'popular', 'latest'];
+
+    private const SORT_PARAMS = ['popular' => 'CITED desc', 'latest' => 'FIRST_PDATE_D desc'];
+
+    /**
+     * How the topic is matched, from strictest to loosest. Matching the whole text pulls in papers
+     * that only mention the topic once, so titles and abstracts are searched. "Popular" starts with
+     * titles only, because citation sorting otherwise floats famous but off-topic papers to the top.
+     */
+    private const MODES = [
+        'relevant' => ['phrase', 'words'],
+        'popular'  => ['title', 'phrase', 'words'],
+        'latest'   => ['phrase', 'words'],
+    ];
+
+    /** A stricter match is kept only when it finds at least this many articles; otherwise a looser one is tried. */
+    private const MIN_HITS = 20;
+
+    /** Looser matches are only tried while the search is still quick, since each one is another upstream call. */
+    private const FALLBACK_BUDGET_SECONDS = 10;
+
+    private static function topicQuery(string $query, string $mode): string
+    {
+        $phrase = '"' . str_replace('"', '', $query) . '"';
+
+        // Lower case, so "and" or "not" in a topic is never read as an operator. Leading or trailing
+        // "-" and "'" are stripped, so "-19" can never become a NOT clause and a lone "-" is dropped.
+        $tokens = array_filter(array_map(fn ($word) => trim(mb_strtolower($word), "-'"), explode(' ', $query)), fn ($word) => $word !== '');
+        $words = implode(' AND ', $tokens ?: ['"' . str_replace('"', '', $query) . '"']);
+
+        return match ($mode) {
+            'title'  => "TITLE:{$phrase}",
+            'phrase' => "(TITLE:{$phrase} OR ABSTRACT:{$phrase})",
+            default  => "(TITLE:({$words}) OR ABSTRACT:({$words}))",
+        };
+    }
+
+    private function searchPage(string $query, string $mode, string $mark, string $sort): array
+    {
+        return $this->get('/search', array_filter([
+            'query'      => self::topicQuery($query, $mode) . ' AND OPEN_ACCESS:y AND IN_EPMC:y AND ' . self::LICENCE_FILTER
+                . ' AND FIRST_PDATE:[2015-01-01 TO 2100-12-31]',
+            'format'     => 'json',
+            'resultType' => 'core',
+            'pageSize'   => self::PAGE_SIZE,
+            'cursorMark' => $mark,
+            'sort'       => self::SORT_PARAMS[$sort] ?? null,
+        ]));
+    }
+
+    /**
+     * @param string $cursor '*' for the first page, or the nextCursor from a previous page. The cursor
+     *                       carries the match mode, so every page of one search uses the same query.
+     */
+    public function search(string $query, string $cursor = '*', string $sort = 'relevant'): array
     {
         $query = trim(preg_replace('/\s+/', ' ', $query));
-        $key = 'journals:search:' . sha1(mb_strtolower($query) . '|' . $cursor);
+        $sort = in_array($sort, self::SORTS, true) ? $sort : 'relevant';
+        $key = 'journals:search:' . sha1(mb_strtolower($query) . '|' . $sort . '|' . $cursor);
 
-        return $this->cached($key, self::SEARCH_TTL, function () use ($query, $cursor) {
-            $data = $this->get('/search', [
-                'query'      => '(' . $query . ') AND OPEN_ACCESS:y AND IN_EPMC:y AND ' . self::LICENCE_FILTER . ' AND FIRST_PDATE:[2015-01-01 TO 2100-12-31]',
-                'format'     => 'json',
-                'resultType' => 'core',
-                'pageSize'   => self::PAGE_SIZE,
-                'cursorMark' => $cursor,
-            ]);
+        return $this->cached($key, self::SEARCH_TTL, function () use ($query, $cursor, $sort) {
+            if ($cursor === '*') {
+                [$mode, $data] = $this->firstPage($query, $sort);
+                $mark = '*';
+            } else {
+                [$mode, $mark] = array_pad(explode(':', $cursor, 2), 2, '');
+                // A cursor from before the match modes existed cannot be continued. Ending the list is
+                // better than restarting at page one and showing the same articles twice.
+                if (!in_array($mode, array_merge(...array_values(self::MODES)), true) || $mark === '') {
+                    return ['total' => 0, 'results' => [], 'nextCursor' => null];
+                }
+                $data = $this->searchPage($query, $mode, $mark, $sort);
+            }
 
             $results = collect($data['resultList']['result'] ?? [])
                 ->filter(fn ($r) => !empty($r['pmcid']) && $this->licenceAllowed($r['license'] ?? null))
@@ -74,9 +134,31 @@ class JournalLibrary
             return [
                 'total'      => (int) ($data['hitCount'] ?? 0),
                 'results'    => $results,
-                'nextCursor' => $next && $next !== $cursor && count($data['resultList']['result'] ?? []) === self::PAGE_SIZE ? $next : null,
+                'nextCursor' => $next && $next !== $mark && count($data['resultList']['result'] ?? []) === self::PAGE_SIZE ? "{$mode}:{$next}" : null,
             ];
         });
+    }
+
+    /**
+     * Tries the strictest match first and loosens it while it finds too few articles, keeping
+     * whichever match found the most. Stops early once the time budget is used.
+     *
+     * @return array{0: string, 1: array} the chosen mode and its first page
+     */
+    private function firstPage(string $query, string $sort): array
+    {
+        $started = microtime(true);
+        $best = null;
+
+        foreach (self::MODES[$sort] as $mode) {
+            $data = $this->searchPage($query, $mode, '*', $sort);
+            $hits = (int) ($data['hitCount'] ?? 0);
+            if ($best === null || $hits > $best[2]) $best = [$mode, $data, $hits];
+
+            if ($hits >= self::MIN_HITS || microtime(true) - $started > self::FALLBACK_BUDGET_SECONDS) break;
+        }
+
+        return [$best[0], $best[1]];
     }
 
     public function article(string $pmcid): ?array
@@ -119,6 +201,7 @@ class JournalLibrary
             'authors'   => self::shortAuthors($r['authorString'] ?? ''),
             'journal'   => $r['journalInfo']['journal']['title'] ?? ($r['bookOrReportDetails']['publisher'] ?? null),
             'year'      => isset($r['pubYear']) ? (int) $r['pubYear'] : null,
+            'citedBy'   => (int) ($r['citedByCount'] ?? 0),
             'doi'       => $r['doi'] ?? null,
             'licence'   => strtoupper($licence),
             'licenceUrl'=> self::licenceUrl($licence),
