@@ -9,7 +9,7 @@ export default function BandScoreBar({ label, score, maxScore = 9 }) {
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{label}</span>
-        <span style={{ fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700, color }}>
+        <span style={{ fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color }}>
           {score ?? '—'}
         </span>
       </div>

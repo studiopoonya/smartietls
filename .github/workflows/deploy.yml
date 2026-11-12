@@ -38,6 +38,7 @@ jobs:
             git pull origin main
             /www/server/php/84/bin/php /usr/bin/composer install --optimize-autoloader --no-dev --ignore-platform-req=ext-fileinfo
             /www/server/php/84/bin/php artisan migrate --force
+            /www/server/php/84/bin/php artisan db:seed --class=CurriculumSeeder --force
             /www/server/php/84/bin/php artisan config:cache
             /www/server/php/84/bin/php artisan route:cache
             chmod -R 775 storage bootstrap/cache

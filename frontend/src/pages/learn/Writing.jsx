@@ -11,6 +11,10 @@ import BandScoreBar from '../../components/common/BandScoreBar';
 import WordCounter from '../../components/common/WordCounter';
 import { getBandColor } from '../../lib/utils';
 import api from '../../lib/axios';
+import { toast } from '../../components/common/Toast';
+import AnnotatedText from '../../components/feedback/AnnotatedText';
+import StagedLoader from '../../components/feedback/StagedLoader';
+import FeedbackLanguageToggle from '../../components/common/FeedbackLanguage';
 
 /* ─── Chart data pool ─── */
 const TASK1_CHART_POOL = [
@@ -19,8 +23,8 @@ const TASK1_CHART_POOL = [
     title: 'Households in Owned and Rented Accommodation, England & Wales (1918–2011)',
     xKey: 'year', unit: '%',
     series: [
-      { key: 'owned', label: 'Owned', color: '#7c3aed' },
-      { key: 'rented', label: 'Rented', color: '#06b6d4' },
+      { key: 'owned', label: 'Owned', color: '#6A35E8' },
+      { key: 'rented', label: 'Rented', color: '#0A7A9E' },
     ],
     data: [
       { year: '1918', owned: 23, rented: 77 },
@@ -38,7 +42,7 @@ const TASK1_CHART_POOL = [
     type: 'bar',
     title: 'Number of Visitors to London Museums, 2023 (millions)',
     xKey: 'museum', unit: 'M',
-    series: [{ key: 'visitors', label: 'Visitors (M)', color: '#7c3aed' }],
+    series: [{ key: 'visitors', label: 'Visitors (M)', color: '#6A35E8' }],
     data: [
       { museum: 'British Museum', visitors: 5.8 },
       { museum: 'Nat. Gallery', visitors: 4.2 },
@@ -51,9 +55,9 @@ const TASK1_CHART_POOL = [
     title: 'Average Monthly Temperature in Three Cities (°C)',
     xKey: 'month', unit: '°C',
     series: [
-      { key: 'london', label: 'London', color: '#7c3aed' },
-      { key: 'sydney', label: 'Sydney', color: '#06b6d4' },
-      { key: 'dubai',  label: 'Dubai',  color: '#f59e0b' },
+      { key: 'london', label: 'London', color: '#6A35E8' },
+      { key: 'sydney', label: 'Sydney', color: '#0A7A9E' },
+      { key: 'dubai',  label: 'Dubai',  color: '#AE5408' },
     ],
     data: [
       { month: 'Jan', london: 5,  sydney: 26, dubai: 19 },
@@ -68,7 +72,7 @@ const TASK1_CHART_POOL = [
     type: 'bar',
     title: 'Internet Users by Region, 2023 (% of population)',
     xKey: 'region', unit: '%',
-    series: [{ key: 'pct', label: 'Internet Users (%)', color: '#10b981' }],
+    series: [{ key: 'pct', label: 'Internet Users (%)', color: '#0A7F5C' }],
     data: [
       { region: 'North America', pct: 93 },
       { region: 'Europe',        pct: 89 },
@@ -82,9 +86,9 @@ const TASK1_CHART_POOL = [
     title: 'Electricity Generated from Renewable Sources (% of total), 2000–2020',
     xKey: 'year', unit: '%',
     series: [
-      { key: 'germany', label: 'Germany', color: '#7c3aed' },
-      { key: 'uk',      label: 'UK',      color: '#06b6d4' },
-      { key: 'usa',     label: 'USA',     color: '#f59e0b' },
+      { key: 'germany', label: 'Germany', color: '#6A35E8' },
+      { key: 'uk',      label: 'UK',      color: '#0A7A9E' },
+      { key: 'usa',     label: 'USA',     color: '#AE5408' },
     ],
     data: [
       { year: '2000', germany: 6,  uk: 2,  usa: 9  },
@@ -98,7 +102,7 @@ const TASK1_CHART_POOL = [
 
 function Task1Chart({ chart, isMobile }) {
   const height = isMobile ? 200 : 250;
-  const axisStyle = { fill: 'var(--text-muted)', fontSize: 11 };
+  const axisStyle = { fill: 'var(--text-muted)', fontSize: 12 };
   const gridProps = { stroke: 'rgba(255,255,255,0.06)' };
   const tooltipStyle = { background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 };
   const commonProps = { data: chart.data, margin: { top: 10, right: 20, left: 0, bottom: 5 } };
@@ -106,7 +110,7 @@ function Task1Chart({ chart, isMobile }) {
 
   return (
     <div style={{ marginTop: 14 }}>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, textAlign: 'center', fontStyle: 'italic' }}>{chart.title}</div>
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, textAlign: 'center', fontStyle: 'italic' }}>{chart.title}</div>
       <ResponsiveContainer width="100%" height={height}>
         {chart.type === 'line' ? (
           <LineChart {...commonProps}>
@@ -251,8 +255,8 @@ export default function Writing() {
         const s = steps[i];
         api.post('/sessions', { module: 'writing', input_data: { task_type: s.taskType, prompt: s.prompt, essay: essays[i] }, ai_feedback: res, band_score: res.overallBand }).catch(() => {});
       });
-    } catch {
-      /* leave analyzing=false so user can retry */
+    } catch (err) {
+      toast(err.response?.data?.message ?? 'The evaluation failed. Your essays are kept, so please try again.', 'error');
     } finally {
       setAnalyzing(false);
     }
@@ -276,7 +280,7 @@ export default function Writing() {
     const doneCount = taskDone.filter(Boolean).length;
     const pct       = Math.round((doneCount / steps.length) * 100);
     return (
-      <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 520 }}>
+      <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 520, margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <GlowCard style={{ padding: isMobile ? 28 : 44, textAlign: 'center' }}>
             {/* Spinner */}
@@ -285,7 +289,7 @@ export default function Writing() {
             <p style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 28 }}>AI is reviewing all 4 tasks simultaneously</p>
 
             {/* Percentage */}
-            <div style={{ fontFamily: 'Space Mono', fontSize: isMobile ? 48 : 64, fontWeight: 700, lineHeight: 1, color: 'var(--accent-primary)', marginBottom: 6 }}>
+            <div style={{ fontFamily: 'var(--font-score)', fontSize: isMobile ? 48 : 64, fontWeight: 700, lineHeight: 1, color: 'var(--accent-primary)', marginBottom: 6 }}>
               {pct}%
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>
@@ -297,7 +301,7 @@ export default function Writing() {
               <motion.div
                 animate={{ width: `${pct}%` }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                style={{ height: '100%', background: 'linear-gradient(90deg, var(--accent-primary), #06B6D4)', borderRadius: 3 }}
+                style={{ height: '100%', background: 'linear-gradient(90deg, var(--accent-primary), #0A7A9E)', borderRadius: 3 }}
               />
             </div>
 
@@ -316,15 +320,16 @@ export default function Writing() {
                       : <div style={{ width: 14, height: 14, border: '2px solid rgba(124,58,237,0.5)', borderTopColor: 'var(--accent-primary)', borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
                     }
                   </div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: taskDone[i] ? 'var(--accent-success)' : 'var(--text-muted)', fontFamily: 'Space Grotesk' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: taskDone[i] ? 'var(--accent-success)' : 'var(--text-muted)', fontFamily: 'var(--font-display)' }}>
                     {s.label}
                   </div>
-                  <div style={{ fontSize: 9, color: taskDone[i] ? 'rgba(16,185,129,0.7)' : 'var(--text-muted)', marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: taskDone[i] ? 'rgba(16,185,129,0.7)' : 'var(--text-muted)', marginTop: 2 }}>
                     {taskDone[i] ? 'Done' : 'Analyzing'}
                   </div>
                 </div>
               ))}
             </div>
+            <div style={{ textAlign: 'left' }}><StagedLoader note={null} /></div>
           </GlowCard>
         </motion.div>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -336,11 +341,11 @@ export default function Writing() {
   if (results) {
     const avg = results.reduce((s, r) => s + (r?.overallBand ?? 0), 0) / results.length;
     return (
-      <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 700 }}>
+      <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 700, margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <GlowCard style={{ padding: 28, textAlign: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Overall Writing Score</div>
-            <div style={{ fontFamily: 'Space Mono', fontSize: 64, fontWeight: 700, color: getBandColor(+avg.toFixed(1)), lineHeight: 1 }}>{avg.toFixed(1)}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Overall Writing Score</div>
+            <div style={{ fontFamily: 'var(--font-score)', fontSize: 64, fontWeight: 700, color: getBandColor(+avg.toFixed(1)), lineHeight: 1 }}>{avg.toFixed(1)}</div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, marginBottom: 22 }}>Average across 4 tasks</div>
             <button onClick={handleRestart} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               <RefreshCw size={15} /> Start Over
@@ -351,22 +356,31 @@ export default function Writing() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{steps[i].label}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{steps[i].sublabel}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{steps[i].sublabel}</div>
                 </div>
-                <div style={{ fontFamily: 'Space Mono', fontSize: 26, fontWeight: 700, color: getBandColor(res.overallBand) }}>{res.overallBand}</div>
+                <div style={{ fontFamily: 'var(--font-score)', fontSize: 26, fontWeight: 700, color: getBandColor(res.overallBand) }}>{res.overallBand}</div>
               </div>
               <BandScoreBar label="Task Achievement"     score={res.criteria?.taskAchievement?.score} />
               <BandScoreBar label="Coherence & Cohesion" score={res.criteria?.coherenceCohesion?.score} />
               <BandScoreBar label="Lexical Resource"     score={res.criteria?.lexicalResource?.score} />
               <BandScoreBar label="Grammatical Range"    score={res.criteria?.grammaticalRange?.score} />
-              {res.highlights?.vocabularyToImprove?.length > 0 && (
+              {(() => {
+                const marks = res.errors?.length ? res.errors : (res.highlights?.vocabularyToImprove ?? []).map(v => ({ ...v, category: 'vocabulary', correction: v.suggestion, explanation: v.reason }));
+                return (
+                  <details style={{ marginTop: 12 }} open={i === 0}>
+                    <summary style={{ cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 8 }}>Your marked essay ({marks.length} correction{marks.length === 1 ? '' : 's'})</summary>
+                    <AnnotatedText text={essays[i]} errors={marks} title="Tap a marked phrase to see the fix" />
+                  </details>
+                );
+              })()}
+              {!res.errors?.length && res.highlights?.vocabularyToImprove?.length > 0 && (
                 <div style={{ marginTop: 12 }}>
-                  <div style={{ fontSize: 11, color: '#F59E0B', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Vocab Upgrades</div>
+                  <div style={{ fontSize: 12, color: '#AE5408', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Vocab Upgrades</div>
                   {res.highlights.vocabularyToImprove.slice(0, 3).map((v, j) => (
                     <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, fontSize: 12 }}>
-                      <span style={{ color: 'var(--accent-danger)', fontFamily: 'Space Mono' }}>{v.original}</span>
+                      <span style={{ color: 'var(--accent-danger)', fontFamily: 'var(--font-score)' }}>{v.original}</span>
                       <span style={{ color: 'var(--text-muted)' }}>→</span>
-                      <span style={{ color: 'var(--accent-success)', fontFamily: 'Space Mono', fontWeight: 700 }}>{v.suggestion}</span>
+                      <span style={{ color: 'var(--accent-success)', fontFamily: 'var(--font-score)', fontWeight: 700 }}>{v.suggestion}</span>
                     </div>
                   ))}
                 </div>
@@ -380,7 +394,7 @@ export default function Writing() {
 
   /* ── Writing screen ── */
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 760 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 760, margin: '0 auto' }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
@@ -389,7 +403,8 @@ export default function Writing() {
           </div>
           <h1 style={{ fontSize: isMobile ? 20 : 26 }}>Writing Practice</h1>
         </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Complete all tasks, then get AI feedback on everything at once</p>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 10 }}>Complete all tasks, then get AI feedback on everything at once</p>
+        <FeedbackLanguageToggle />
       </motion.div>
 
       {/* Step progress bar */}
@@ -406,14 +421,14 @@ export default function Writing() {
                 background: isCurrent ? 'rgba(124,58,237,0.15)' : isPast ? 'rgba(124,58,237,0.07)' : 'var(--bg-elevated)',
                 color: isLocked ? 'var(--text-muted)' : isCurrent ? 'var(--accent-glow)' : isPast ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 cursor: isLocked ? 'default' : 'pointer', textAlign: 'center',
-                fontSize: isMobile ? 10 : 12, fontWeight: 600, fontFamily: 'Space Grotesk',
+                fontSize: isMobile ? 12 : 12, fontWeight: 600, fontFamily: 'var(--font-display)',
                 transition: 'all 0.2s', opacity: isLocked ? 0.45 : 1,
               }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                 {isPast ? <CheckCircle2 size={11} style={{ color: 'var(--accent-success)' }} /> : isLocked ? <Lock size={10} /> : null}
                 {s.label}
               </div>
-              {!isMobile && <div style={{ fontSize: 10, opacity: 0.65, marginTop: 2 }}>{s.sublabel}</div>}
+              {!isMobile && <div style={{ fontSize: 12, opacity: 0.65, marginTop: 2 }}>{s.sublabel}</div>}
             </button>
           );
         })}
@@ -423,7 +438,7 @@ export default function Writing() {
       {stepIdx === 0 && essays.every(e => !e.trim()) && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
           <button onClick={handleShuffle}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'Space Grotesk', transition: 'all 0.2s' }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-display)', transition: 'all 0.2s' }}>
             <Shuffle size={12} /> Shuffle Prompts
           </button>
         </div>
@@ -434,8 +449,8 @@ export default function Writing() {
         {/* Question card */}
         <GlowCard style={{ padding: isMobile ? 14 : 20, marginBottom: 12 }} hover={false}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Question</div>
-            <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600, fontFamily: 'Space Mono' }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Question</div>
+            <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600, fontFamily: 'var(--font-score)' }}>
               {step.taskType === 'task1' ? 'Task 1 · Report' : 'Task 2 · Essay'} · min {step.minWords} words
             </div>
           </div>
@@ -451,8 +466,8 @@ export default function Writing() {
               <WordCounter text={essay} target={step.minWords} />
             </div>
             <span style={{
-              fontSize: 13, fontFamily: 'Space Mono', fontWeight: 700,
-              color: timeUp ? 'var(--accent-danger)' : timeLeft <= 120 ? 'var(--accent-danger)' : timeLeft <= 300 ? '#F59E0B' : 'var(--accent-success)',
+              fontSize: 13, fontFamily: 'var(--font-score)', fontWeight: 700,
+              color: timeUp ? 'var(--accent-danger)' : timeLeft <= 120 ? 'var(--accent-danger)' : timeLeft <= 300 ? '#AE5408' : 'var(--accent-success)',
               animation: timeUp ? 'timeblink 1s step-start infinite' : 'none',
             }}>
               ⏱ {timeUp ? "Time's up!" : fmtTime(timeLeft)}

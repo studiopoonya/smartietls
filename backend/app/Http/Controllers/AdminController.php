@@ -147,7 +147,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name'        => 'sometimes|string|max:255',
             'email'       => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
-            'target_band' => 'sometimes|integer|min:4|max:9',
+            'target_band' => 'sometimes|numeric|min:4|max:9|multiple_of:0.5',
         ]);
 
         $user->update($validated);

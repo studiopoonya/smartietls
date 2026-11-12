@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AI;
 
 use App\Http\Controllers\Controller;
 use App\Services\ClaudeService;
+use App\Services\ErrorBank;
 use App\Services\Prompts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class AISpeakingController extends Controller
 {
-    public function __construct(private ClaudeService $claude) {}
+    public function __construct(private ClaudeService $claude, private ErrorBank $errors) {}
 
     public function chat(Request $request): JsonResponse
     {
@@ -89,10 +90,16 @@ class AISpeakingController extends Controller
         try {
             $result = $this->claude->getJson(
                 $apiKey,
-                Prompts::SPEAKING_ANSWER_EVALUATOR,
+                Prompts::forLearner(Prompts::SPEAKING_ANSWER_EVALUATOR, $user),
                 $userMessage,
                 1500
             );
+
+            ErrorBank::safely(function () use ($user, $result) {
+                $this->errors->captureMany($user, 'speaking', $result['grammarErrors'] ?? [], null, 'corrected', 'explanation', 'grammar');
+                $this->errors->captureMany($user, 'speaking', $result['vocabularyUpgrades'] ?? [], null, 'suggestion', 'reason', 'vocabulary');
+            });
+
             return response()->json($result);
         } catch (\Exception $e) {
             Log::error('Speaking evaluate error: ' . $e->getMessage());

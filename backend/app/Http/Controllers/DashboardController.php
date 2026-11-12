@@ -40,6 +40,7 @@ class DashboardController extends Controller
                 'exam_date' => $user->exam_date?->toDateString(),
                 'is_admin' => $user->is_admin,
                 'has_api_key' => $user->hasApiKey(),
+                'ai_ready' => $user->aiReady(),
             ],
             'stats' => [
                 'total_sessions' => $user->learningSessions()->count(),

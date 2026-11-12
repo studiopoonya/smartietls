@@ -1,23 +1,30 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
-import { Headphones, Play, Square, RotateCcw, Volume2, CheckCircle, XCircle, X, ChevronRight, FileText, Lock } from 'lucide-react';
+import { Headphones, Play, Square, RotateCcw, CheckCircle, XCircle, X, Lock } from 'lucide-react';
 import { useListeningGenerate } from '../../hooks/useAI';
 import { useLevels } from '../../hooks/useLevels';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import GlowCard from '../../components/common/GlowCard';
 import Timer from '../../components/common/Timer';
 import api from '../../lib/axios';
+import { stopSpeaking } from '../../lib/speech';
+import PracticeTranscript from '../../components/drills/PracticeTranscript';
 
-const SECTIONS = [
-  { id: 0, label: 'Random', desc: 'Surprise me', color: '#A855F7' },
-  { id: 1, label: 'Section 1', desc: 'Social Dialogue', color: '#06B6D4' },
-  { id: 2, label: 'Section 2', desc: 'Social Monologue', color: '#10B981' },
-  { id: 3, label: 'Section 3', desc: 'Academic Discussion', color: '#F59E0B' },
-  { id: 4, label: 'Section 4', desc: 'Academic Lecture', color: '#EF4444' },
+const MODES = [
+  { id: 'test', label: 'Test mode', desc: 'Audio plays once, like the real exam' },
+  { id: 'practice', label: 'Practice mode', desc: 'Replay any sentence and slow it down' },
 ];
 
-const SECTION_COLORS = { 1: '#06B6D4', 2: '#10B981', 3: '#F59E0B', 4: '#EF4444' };
+const SECTIONS = [
+  { id: 0, label: 'Random', desc: 'Surprise me', color: '#6A35E8' },
+  { id: 1, label: 'Section 1', desc: 'Social Dialogue', color: '#0A7A9E' },
+  { id: 2, label: 'Section 2', desc: 'Social Monologue', color: '#0A7F5C' },
+  { id: 3, label: 'Section 3', desc: 'Academic Discussion', color: '#AE5408' },
+  { id: 4, label: 'Section 4', desc: 'Academic Lecture', color: '#D5301F' },
+];
+
+const SECTION_COLORS = { 1: '#0A7A9E', 2: '#0A7F5C', 3: '#AE5408', 4: '#D5301F' };
 
 // Waveform bar heights (CSS animation, not random)
 const BAR_HEIGHTS = [
@@ -34,7 +41,6 @@ export default function Listening() {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(null);
-  const [showTranscript, setShowTranscript] = useState(false);
   const [timerRunning, setTimerRunning] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
   // Audio / TTS state
@@ -43,6 +49,8 @@ export default function Listening() {
   const [audioError, setAudioError] = useState(false);
   const [generateError, setGenerateError] = useState(null);
   const [fromCache, setFromCache] = useState(false);
+  const [mode, setMode] = useState('test');
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   const utteranceRef = useRef(null);
   const progressIntervalRef = useRef(null);
@@ -119,10 +127,11 @@ export default function Listening() {
 
   const playAudio = () => {
     if (!hasTTS || !exercise) return;
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     clearInterval(progressIntervalRef.current);
     setAudioProgress(0);
     setAudioError(false);
+    setHasPlayed(true);
     stoppedRef.current = false;
 
     const startPlay = () => {
@@ -180,8 +189,8 @@ export default function Listening() {
   const handleGenerate = () => {
     stopAudio();
     setExercise(null); setAnswers({}); setSubmitted(false); setScore(null);
-    setShowTranscript(false); setShowQuestions(false); setAudioProgress(0); setAudioError(false);
-    setGenerateError(null); setFromCache(false);
+    setShowQuestions(false); setAudioProgress(0); setAudioError(false);
+    setGenerateError(null); setFromCache(false); setHasPlayed(false);
     generate({ section: section || undefined, difficulty }, {
       onSuccess: (data) => { setExercise(data); setTimerRunning(true); setFromCache(!!data._cached); },
       onError: (err) => setGenerateError(err?.response?.data?.message || 'Failed to generate exercise'),
@@ -211,7 +220,10 @@ export default function Listening() {
     }).catch(() => {}).finally(() => qc.invalidateQueries({ queryKey: ['levels'] }));
   };
 
-  const sectionColor = exercise ? (SECTION_COLORS[exercise.section] ?? '#06B6D4') : '#06B6D4';
+  const sectionColor = exercise ? (SECTION_COLORS[exercise.section] ?? '#0A7A9E') : '#0A7A9E';
+  // In test mode the recording plays once and the transcript stays hidden until the answers are in.
+  const canReplay = mode === 'practice' || submitted;
+  const playedOnce = !canReplay && hasPlayed && audioState !== 'playing';
 
   // Questions panel content (shared between desktop and mobile sheet)
   const QuestionsPanel = () => (
@@ -219,7 +231,7 @@ export default function Listening() {
       {exercise.questions?.map((q, i) => (
         <div key={q.id} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: i < exercise.questions.length - 1 ? '1px solid var(--border)' : 'none' }}>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', marginBottom: 8, fontWeight: 500, lineHeight: 1.5 }}>
-            <span style={{ fontFamily: 'Space Mono', fontWeight: 700, color: sectionColor, marginRight: 7, fontSize: 12 }}>{q.id}.</span>
+            <span style={{ fontFamily: 'var(--font-score)', fontWeight: 700, color: sectionColor, marginRight: 7, fontSize: 12 }}>{q.id}.</span>
             {q.question}
           </div>
           {q.type === 'mcq' && q.options ? (
@@ -261,7 +273,7 @@ export default function Listening() {
         </button>
       ) : score && (
         <div style={{ textAlign: 'center', padding: '16px', background: 'var(--bg-elevated)', borderRadius: 12, border: `1px solid ${sectionColor}40` }}>
-          <div style={{ fontFamily: 'Space Mono', fontSize: 30, fontWeight: 700, color: sectionColor }}>{score.correct}/{score.total}</div>
+          <div style={{ fontFamily: 'var(--font-score)', fontSize: 30, fontWeight: 700, color: sectionColor }}>{score.correct}/{score.total}</div>
           <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Approx Band <span style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>{score.band}</span></div>
           <button className="btn-secondary" onClick={handleGenerate} style={{ marginTop: 10, width: '100%' }}>New Exercise</button>
         </div>
@@ -270,11 +282,11 @@ export default function Listening() {
   );
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100, margin: '0 auto' }}>
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
           <div style={{ width: 36, height: 36, background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Headphones size={16} style={{ color: '#F59E0B' }} />
+            <Headphones size={16} style={{ color: '#AE5408' }} />
           </div>
           <h1 style={{ fontSize: isMobile ? 20 : 26 }}>Listening Practice</h1>
         </div>
@@ -301,7 +313,7 @@ export default function Listening() {
       {!exercise && !isPending && (
         <GlowCard style={{ padding: isMobile ? 22 : 36, maxWidth: 560, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'linear-gradient(135deg, #F59E0B, #EF4444)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', boxShadow: '0 0 40px rgba(245,158,11,0.3)' }}>
+            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'linear-gradient(135deg, #AE5408, #D5301F)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', boxShadow: '0 0 40px rgba(245,158,11,0.3)' }}>
               <Headphones size={26} color="white" />
             </div>
             <h2 style={{ fontSize: isMobile ? 18 : 20, marginBottom: 6 }}>IELTS Listening Test</h2>
@@ -314,8 +326,8 @@ export default function Listening() {
               {SECTIONS.map(s => (
                 <button key={s.id} onClick={() => setSection(s.id)}
                   style={{ padding: '10px 6px', borderRadius: 10, border: `1px solid ${section === s.id ? s.color : 'var(--border)'}`, background: section === s.id ? `${s.color}18` : 'var(--bg-elevated)', color: section === s.id ? s.color : 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700 }}>{s.label}</div>
-                  <div style={{ fontSize: 9, color: section === s.id ? s.color : 'var(--text-muted)', marginTop: 2, lineHeight: 1.2 }}>{s.desc}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700 }}>{s.label}</div>
+                  <div style={{ fontSize: 12, color: section === s.id ? s.color : 'var(--text-muted)', marginTop: 2, lineHeight: 1.2 }}>{s.desc}</div>
                 </button>
               ))}
             </div>
@@ -331,11 +343,24 @@ export default function Listening() {
                 return (
                   <button key={d} disabled={locked} onClick={() => !locked && setDifficulty(d)}
                     title={locked ? `Score Band ${d} in an easier exercise to unlock` : undefined}
-                    style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: `1px solid ${difficulty === d ? '#F59E0B' : 'var(--border)'}`, background: difficulty === d ? 'rgba(245,158,11,0.1)' : 'var(--bg-elevated)', color: locked ? 'var(--text-muted)' : (difficulty === d ? '#F59E0B' : 'var(--text-secondary)'), cursor: locked ? 'not-allowed' : 'pointer', fontFamily: 'Space Mono', fontWeight: 700, transition: 'all 0.2s', opacity: locked ? 0.45 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                    style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: `1px solid ${difficulty === d ? '#AE5408' : 'var(--border)'}`, background: difficulty === d ? 'rgba(245,158,11,0.1)' : 'var(--bg-elevated)', color: locked ? 'var(--text-muted)' : (difficulty === d ? '#AE5408' : 'var(--text-secondary)'), cursor: locked ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-score)', fontWeight: 700, transition: 'all 0.2s', opacity: locked ? 0.45 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                     {locked && <Lock size={10} />}{d}
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 600 }}>Mode</label>
+            <div role="radiogroup" aria-label="Listening mode" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {MODES.map(m => (
+                <button key={m.id} type="button" role="radio" aria-checked={mode === m.id} onClick={() => setMode(m.id)}
+                  style={{ padding: '10px 12px', borderRadius: 10, textAlign: 'left', cursor: 'pointer', border: `1px solid ${mode === m.id ? '#AE5408' : 'var(--border)'}`, background: mode === m.id ? 'rgba(245,158,11,0.1)' : 'var(--bg-elevated)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: mode === m.id ? '#AE5408' : 'var(--text-primary)' }}>{m.label}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2, lineHeight: 1.4 }}>{m.desc}</div>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -357,7 +382,7 @@ export default function Listening() {
       {/* Loading */}
       {isPending && (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
-          <div style={{ width: 44, height: 44, border: '3px solid var(--border)', borderTopColor: '#F59E0B', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 14px' }} />
+          <div style={{ width: 44, height: 44, border: '3px solid var(--border)', borderTopColor: '#AE5408', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 14px' }} />
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Generating listening exercise...</p>
           <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
         </div>
@@ -372,7 +397,7 @@ export default function Listening() {
             {score && isMobile && (
               <div style={{ marginBottom: 12, padding: '14px 16px', background: 'var(--bg-card)', border: `1px solid ${sectionColor}40`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ fontFamily: 'Space Mono', fontSize: 22, fontWeight: 700, color: sectionColor }}>{score.correct}/{score.total}</div>
+                  <div style={{ fontFamily: 'var(--font-score)', fontSize: 22, fontWeight: 700, color: sectionColor }}>{score.correct}/{score.total}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Band {score.band}</div>
                 </div>
                 <button className="btn-secondary" onClick={handleGenerate} style={{ padding: '8px 14px', fontSize: 12 }}>New</button>
@@ -385,22 +410,22 @@ export default function Listening() {
               <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                    <span style={{ fontSize: 10, color: sectionColor, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.08em' }}>{exercise.sectionLabel || `Section ${exercise.section}`}</span>
-                    {fromCache && <span style={{ fontSize: 9, background: 'rgba(16,185,129,0.15)', color: 'var(--accent-success)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>⚡ Instant</span>}
+                    <span style={{ fontSize: 12, color: sectionColor, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.08em' }}>{exercise.sectionLabel || `Section ${exercise.section}`}</span>
+                    {fromCache && <span style={{ fontSize: 12, background: 'rgba(16,185,129,0.15)', color: 'var(--accent-success)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 4, padding: '1px 5px', fontWeight: 700 }}>⚡ Instant</span>}
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{exercise.title}</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <Timer running={timerRunning} />
-                  <button className="btn-secondary" onClick={handleGenerate} style={{ padding: '5px 10px', fontSize: 11 }}>New</button>
+                  <button className="btn-secondary" onClick={handleGenerate} style={{ padding: '5px 10px', fontSize: 12 }}>New</button>
                 </div>
               </div>
 
               {/* Scenario */}
               <div style={{ padding: '12px 16px', background: `${sectionColor}08`, borderBottom: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 10, color: sectionColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Situation</div>
+                <div style={{ fontSize: 12, color: sectionColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Situation</div>
                 <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 4 }}>{exercise.scenario}</p>
-                {exercise.speakerInfo && <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>{exercise.speakerInfo}</div>}
+                {exercise.speakerInfo && <div style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic' }}>{exercise.speakerInfo}</div>}
               </div>
 
               {/* Audio Player */}
@@ -425,33 +450,37 @@ export default function Listening() {
                     {/* Progress bar */}
                     <div style={{ height: 4, background: 'var(--border)', borderRadius: 3, marginBottom: 16, overflow: 'hidden' }}>
                       <motion.div animate={{ width: `${audioProgress}%` }} transition={{ duration: 0.3 }}
-                        style={{ height: '100%', background: `linear-gradient(90deg, ${sectionColor}, #F59E0B)`, borderRadius: 3 }} />
+                        style={{ height: '100%', background: `linear-gradient(90deg, ${sectionColor}, #AE5408)`, borderRadius: 3 }} />
                     </div>
 
                     {/* Controls */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                      {audioState === 'idle' || audioState === 'finished' ? (
+                      {playedOnce ? (
+                        <div aria-label="Recording played" style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <CheckCircle size={22} style={{ color: 'var(--accent-success)' }} />
+                        </div>
+                      ) : audioState === 'idle' || audioState === 'finished' ? (
                         <button onClick={playAudio}
-                          style={{ width: 52, height: 52, borderRadius: '50%', background: `linear-gradient(135deg, ${sectionColor}, #F59E0B)`, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 24px ${sectionColor}50`, transition: 'all 0.2s' }}>
+                          style={{ width: 52, height: 52, borderRadius: '50%', background: `linear-gradient(135deg, ${sectionColor}, #AE5408)`, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 24px ${sectionColor}50`, transition: 'all 0.2s' }}>
                           {audioState === 'finished' ? <RotateCcw size={20} color="white" /> : <Play size={20} color="white" style={{ marginLeft: 3 }} />}
                         </button>
                       ) : (
                         <button onClick={stopAudio}
-                          style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg, #EF4444, #DC2626)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(239,68,68,0.4)' }}>
+                          style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg, #D5301F, #DC2626)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(239,68,68,0.4)' }}>
                           <Square size={18} color="white" fill="white" />
                         </button>
                       )}
                       <div style={{ textAlign: 'left' }}>
                         <div style={{ fontSize: 13, fontWeight: 600, color: audioState === 'playing' ? sectionColor : audioState === 'finished' ? 'var(--accent-success)' : 'var(--text-secondary)' }}>
-                          {audioState === 'idle' ? 'Ready to play' : audioState === 'playing' ? '● Playing audio...' : '✓ Audio finished'}
+                          {playedOnce ? '✓ Played once' : audioState === 'idle' ? 'Ready to play' : audioState === 'playing' ? '● Playing audio...' : '✓ Audio finished'}
                         </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                          {audioState === 'idle' ? 'Press play to listen' : audioState === 'playing' ? 'Listen carefully' : 'Replay or answer questions'}
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                          {playedOnce ? 'Test mode: answer the questions now' : audioState === 'idle' ? (canReplay ? 'Press play to listen' : 'Test mode: it plays only once') : audioState === 'playing' ? 'Listen carefully' : 'Replay or answer questions'}
                         </div>
                       </div>
-                      {audioState !== 'idle' && (
+                      {canReplay && audioState !== 'idle' && (
                         <button onClick={() => { stopAudio(); setTimeout(playAudio, 100); }}
-                          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                           <RotateCcw size={12} /> Replay
                         </button>
                       )}
@@ -471,25 +500,15 @@ export default function Listening() {
               </div>
 
               {/* Transcript (collapsible, hidden by default) */}
-              <div style={{ borderTop: '1px solid var(--border)' }}>
-                <button onClick={() => setShowTranscript(!showTranscript)}
-                  style={{ width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <FileText size={13} />
-                    Transcript {!submitted && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>(reveal after listening)</span>}
-                  </div>
-                  <ChevronRight size={14} style={{ transform: showTranscript ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
-                </button>
-                <AnimatePresence>
-                  {showTranscript && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden' }}>
-                      <div style={{ padding: '0 16px 16px', lineHeight: 1.9, fontSize: 13, color: 'var(--text-secondary)', maxHeight: isMobile ? '35vh' : '40vh', overflowY: 'auto', whiteSpace: 'pre-line' }}>
-                        {exercise.transcript}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              {canReplay ? (
+                <div style={{ borderTop: '1px solid var(--border)' }}>
+                  <PracticeTranscript key={`${exercise.title}-${submitted}`} transcript={exercise.transcript} colorHex={sectionColor} initiallyShowText={submitted} onBeforePlay={stopAudio} />
+                </div>
+              ) : (
+                <div style={{ borderTop: '1px solid var(--border)', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)' }}>
+                  <Lock size={13} /> Transcript and sentence replay unlock after you submit your answers.
+                </div>
+              )}
             </GlowCard>
 
             {/* Mobile CTA */}
@@ -507,7 +526,7 @@ export default function Listening() {
           {/* Right: Questions (desktop only) */}
           {!isMobile && (
             <GlowCard hover={false} style={{ padding: 18 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, fontFamily: 'Space Grotesk', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, fontFamily: 'var(--font-display)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>Questions</span>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 400 }}>{exercise.questions?.length} items</span>
               </div>

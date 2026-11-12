@@ -3,7 +3,7 @@ export default function WordCounter({ text, target }) {
   const isOk = count >= (target ?? 0);
 
   return (
-    <span style={{ fontSize: 12, fontFamily: 'Space Mono', color: isOk ? 'var(--accent-success)' : 'var(--text-muted)' }}>
+    <span style={{ fontSize: 12, fontFamily: 'var(--font-score)', color: isOk ? 'var(--accent-success)' : 'var(--text-muted)' }}>
       {count} words{target ? ` / ${target} min` : ''}
     </span>
   );

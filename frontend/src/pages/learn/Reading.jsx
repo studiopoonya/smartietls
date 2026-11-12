@@ -70,7 +70,7 @@ export default function Reading() {
   };
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100, margin: '0 auto' }}>
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -80,8 +80,8 @@ export default function Reading() {
             <h1 style={{ fontSize: isMobile ? 20 : 26 }}>Reading Practice</h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 20, padding: '5px 12px' }}>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Unlocked</span>
-            <span style={{ fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700, color: 'var(--accent-success)' }}>Band {unlockedLevel}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Unlocked</span>
+            <span style={{ fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color: 'var(--accent-success)' }}>Band {unlockedLevel}</span>
             {unlockedLevel < 9 && <Lock size={11} style={{ color: 'var(--text-muted)' }} />}
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function Reading() {
           <GlowCard hover={false} style={{ padding: 0, overflow: 'hidden' }}>
             <div style={{ padding: '12px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Passage</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Passage</div>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{passage.title}</div>
               </div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -137,7 +137,7 @@ export default function Reading() {
             </div>
           </GlowCard>
           <GlowCard hover={false} style={{ padding: 18 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, fontFamily: 'Space Grotesk' }}>Questions ({passage.questions?.length})</div>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, fontFamily: 'var(--font-display)' }}>Questions ({passage.questions?.length})</div>
             <div style={{ maxHeight: '62vh', overflowY: 'auto' }}>
               {passage.questions?.map((q, i) => (
                 <QuestionItem key={q.id} q={q} i={i} total={passage.questions.length} answers={answers} setAnswers={setAnswers} submitted={submitted} passage={passage} />
@@ -155,7 +155,7 @@ export default function Reading() {
         <div>
           {score && (
             <div style={{ marginBottom: 14, textAlign: 'center', padding: '14px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12 }}>
-              <div style={{ fontFamily: 'Space Mono', fontSize: 28, fontWeight: 700, color: 'var(--accent-success)' }}>{score.correct}/{score.total}</div>
+              <div style={{ fontFamily: 'var(--font-score)', fontSize: 28, fontWeight: 700, color: 'var(--accent-success)' }}>{score.correct}/{score.total}</div>
               <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Approx Band: <span style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>{score.band}</span></div>
             </div>
           )}
@@ -164,7 +164,7 @@ export default function Reading() {
               <div style={{ fontSize: 14, fontWeight: 700 }}>{passage.title}</div>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <Timer running={timerRunning} />
-                <button className="btn-secondary" onClick={handleGenerate} style={{ padding: '5px 10px', fontSize: 11 }}>New</button>
+                <button className="btn-secondary" onClick={handleGenerate} style={{ padding: '5px 10px', fontSize: 12 }}>New</button>
               </div>
             </div>
             <div style={{ padding: '16px', lineHeight: 1.9, fontSize: 14, color: 'var(--text-secondary)', maxHeight: '50vh', overflowY: 'auto' }}>
@@ -189,7 +189,7 @@ function QuestionItem({ q, i, total, answers, setAnswers, submitted, passage }) 
   return (
     <div style={{ marginBottom: 18, paddingBottom: 18, borderBottom: i < total - 1 ? '1px solid var(--border)' : 'none' }}>
       <div style={{ fontSize: 13, color: 'var(--text-primary)', marginBottom: 8, fontWeight: 500, lineHeight: 1.5 }}>
-        <span style={{ color: 'var(--accent-success)', fontFamily: 'Space Mono', fontWeight: 700, marginRight: 7 }}>{q.id}.</span>
+        <span style={{ color: 'var(--accent-success)', fontFamily: 'var(--font-score)', fontWeight: 700, marginRight: 7 }}>{q.id}.</span>
         {q.question}
       </div>
       {q.type === 'mcq' && q.options ? (
@@ -223,7 +223,7 @@ function QuestionItem({ q, i, total, answers, setAnswers, submitted, passage }) 
 function ScoreResult({ score, onNew }) {
   return (
     <div style={{ marginTop: 12, textAlign: 'center', padding: '14px', background: 'var(--bg-elevated)', borderRadius: 10 }}>
-      <div style={{ fontFamily: 'Space Mono', fontSize: 28, fontWeight: 700, color: 'var(--accent-success)' }}>{score.correct}/{score.total}</div>
+      <div style={{ fontFamily: 'var(--font-score)', fontSize: 28, fontWeight: 700, color: 'var(--accent-success)' }}>{score.correct}/{score.total}</div>
       <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Approx Band: <span style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>{score.band}</span></div>
       <button className="btn-secondary" onClick={onNew} style={{ marginTop: 10, width: '100%' }}>New Passage</button>
     </div>

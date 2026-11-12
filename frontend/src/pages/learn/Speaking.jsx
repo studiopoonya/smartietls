@@ -5,6 +5,7 @@ import {
   ChevronRight, CheckCircle2, Loader2, AlertCircle,
 } from 'lucide-react';
 import { useSpeakingGenerate, useSpeakingEvaluate } from '../../hooks/useAI';
+import StagedLoader, { SPEAKING_STAGES } from '../../components/feedback/StagedLoader';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import GlowCard from '../../components/common/GlowCard';
 import BandScoreBar from '../../components/common/BandScoreBar';
@@ -15,7 +16,7 @@ const SpeechRecognitionAPI = typeof window !== 'undefined'
   ? (window.SpeechRecognition || window.webkitSpeechRecognition || null)
   : null;
 
-const PART_COLORS = { 1: '#A855F7', 2: '#06B6D4', 3: '#10B981' };
+const PART_COLORS = { 1: '#6A35E8', 2: '#0A7A9E', 3: '#0A7F5C' };
 const PART_LABELS = {
   1: 'Part 1 — Introduction & Interview',
   2: 'Part 2 — Individual Long Turn',
@@ -29,27 +30,27 @@ function FeedbackCard({ feedback, isMobile }) {
   return (
     <motion.div initial={{ opacity: 0, x: isMobile ? 0 : 20 }} animate={{ opacity: 1, x: 0 }}>
       <GlowCard style={{ padding: 18, marginBottom: 12 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 14, letterSpacing: '0.06em' }}>Answer Feedback</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 14, letterSpacing: '0.06em' }}>Answer Feedback</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 14 }}>
           {[['Overall', scores?.overall], ['Fluency', scores?.fluency], ['Vocab', scores?.vocabulary], ['Grammar', scores?.grammar]].map(([label, val]) => (
             <div key={label} style={{ textAlign: 'center', padding: '8px 4px', background: 'var(--bg-elevated)', borderRadius: 8 }}>
-              <div style={{ fontFamily: 'Space Mono', fontSize: 20, fontWeight: 700, color: getBandColor(val) }}>{val ?? '–'}</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{label}</div>
+              <div style={{ fontFamily: 'var(--font-score)', fontSize: 20, fontWeight: 700, color: getBandColor(val) }}>{val ?? '–'}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{label}</div>
             </div>
           ))}
         </div>
 
         {grammarErrors?.length > 0 && (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: 'var(--accent-danger)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Grammar Fixes</div>
+            <div style={{ fontSize: 12, color: 'var(--accent-danger)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Grammar Fixes</div>
             {grammarErrors.slice(0, 3).map((e, i) => (
               <div key={i} style={{ marginBottom: 8, padding: '8px 10px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, color: 'var(--accent-danger)', fontFamily: 'Space Mono', textDecoration: 'line-through' }}>{e.original}</span>
+                  <span style={{ fontSize: 12, color: 'var(--accent-danger)', fontFamily: 'var(--font-score)', textDecoration: 'line-through' }}>{e.original}</span>
                   <span style={{ color: 'var(--text-muted)' }}>→</span>
-                  <span style={{ fontSize: 12, color: 'var(--accent-success)', fontFamily: 'Space Mono', fontWeight: 700 }}>{e.corrected}</span>
+                  <span style={{ fontSize: 12, color: 'var(--accent-success)', fontFamily: 'var(--font-score)', fontWeight: 700 }}>{e.corrected}</span>
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>{e.explanation}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{e.explanation}</div>
               </div>
             ))}
           </div>
@@ -57,13 +58,13 @@ function FeedbackCard({ feedback, isMobile }) {
 
         {vocabularyUpgrades?.length > 0 && (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: '#F59E0B', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Vocab Upgrades</div>
+            <div style={{ fontSize: 12, color: '#AE5408', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Vocab Upgrades</div>
             {vocabularyUpgrades.slice(0, 3).map((v, i) => (
               <div key={i} style={{ marginBottom: 6, padding: '7px 10px', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 8 }}>
-                <span style={{ fontSize: 12, color: 'var(--accent-danger)', fontFamily: 'Space Mono' }}>{v.original}</span>
+                <span style={{ fontSize: 12, color: 'var(--accent-danger)', fontFamily: 'var(--font-score)' }}>{v.original}</span>
                 <span style={{ color: 'var(--text-muted)', margin: '0 6px' }}>→</span>
-                <span style={{ fontSize: 12, color: 'var(--accent-success)', fontFamily: 'Space Mono', fontWeight: 700 }}>{v.suggestion}</span>
-                {v.reason && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{v.reason}</div>}
+                <span style={{ fontSize: 12, color: 'var(--accent-success)', fontFamily: 'var(--font-score)', fontWeight: 700 }}>{v.suggestion}</span>
+                {v.reason && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{v.reason}</div>}
               </div>
             ))}
           </div>
@@ -71,7 +72,7 @@ function FeedbackCard({ feedback, isMobile }) {
 
         {betterPhrasing && (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Better Phrasing</div>
+            <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Better Phrasing</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, padding: '10px 12px', background: 'rgba(124,58,237,0.07)', border: '1px solid rgba(124,58,237,0.15)', borderRadius: 8, fontStyle: 'italic' }}>
               "{betterPhrasing}"
             </div>
@@ -80,7 +81,7 @@ function FeedbackCard({ feedback, isMobile }) {
 
         {strengths?.length > 0 && (
           <div>
-            <div style={{ fontSize: 11, color: 'var(--accent-success)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Strengths</div>
+            <div style={{ fontSize: 12, color: 'var(--accent-success)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Strengths</div>
             {strengths.map((s, i) => (
               <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4, paddingLeft: 10, borderLeft: '2px solid var(--accent-success)' }}>{s}</div>
             ))}
@@ -90,7 +91,7 @@ function FeedbackCard({ feedback, isMobile }) {
 
       {tips?.length > 0 && (
         <GlowCard style={{ padding: 16 }}>
-          <div style={{ fontSize: 11, color: 'var(--accent-secondary)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Tips</div>
+          <div style={{ fontSize: 12, color: 'var(--accent-secondary)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Tips</div>
           {tips.map((t, i) => (
             <div key={i} style={{ display: 'flex', gap: 7, fontSize: 12, color: 'var(--text-muted)', marginBottom: 5 }}>
               <span style={{ color: 'var(--accent-primary)', flexShrink: 0 }}>→</span>{t}
@@ -114,7 +115,7 @@ function OverallResults({ feedbacks, questions, saving, onSave, onRestart }) {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <GlowCard style={{ padding: 28, textAlign: 'center', marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>Speaking Test Complete</div>
-        <div style={{ fontFamily: 'Space Mono', fontSize: 64, fontWeight: 700, color: getBandColor(overall), lineHeight: 1 }}>{overall ?? '–'}</div>
+        <div style={{ fontFamily: 'var(--font-score)', fontSize: 64, fontWeight: 700, color: getBandColor(overall), lineHeight: 1 }}>{overall ?? '–'}</div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Average Band Score</div>
       </GlowCard>
 
@@ -143,8 +144,8 @@ function OverallResults({ feedbacks, questions, saving, onSave, onRestart }) {
         return (
           <GlowCard key={i} style={{ padding: 14, marginBottom: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <div style={{ fontSize: 11, color: PART_COLORS[qInfo.part], fontWeight: 600 }}>{qInfo.label}</div>
-              <div style={{ fontFamily: 'Space Mono', fontSize: 16, fontWeight: 700, color: getBandColor(fb.scores?.overall) }}>{fb.scores?.overall}</div>
+              <div style={{ fontSize: 12, color: PART_COLORS[qInfo.part], fontWeight: 600 }}>{qInfo.label}</div>
+              <div style={{ fontFamily: 'var(--font-score)', fontSize: 16, fontWeight: 700, color: getBandColor(fb.scores?.overall) }}>{fb.scores?.overall}</div>
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{qInfo.question}</div>
           </GlowCard>
@@ -438,7 +439,7 @@ export default function Speaking() {
   /* ── Complete screen ── */
   if (phase === 'complete') {
     return (
-      <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 700 }}>
+      <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 700, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
           <div style={{ width: 36, height: 36, background: 'rgba(6,182,212,0.15)', border: '1px solid rgba(6,182,212,0.3)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Mic size={16} style={{ color: 'var(--accent-secondary)' }} />
@@ -451,7 +452,7 @@ export default function Speaking() {
   }
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100, margin: '0 auto' }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
@@ -477,14 +478,14 @@ export default function Speaking() {
             {[[1,'Part 1','4 questions','Introduction'],[2,'Part 2','1 cue card','Long Turn'],[3,'Part 3','3 questions','Discussion']].map(([p, label, count, desc]) => (
               <div key={p} style={{ padding: '12px 8px', background: 'var(--bg-elevated)', borderRadius: 10, border: `1px solid ${PART_COLORS[p]}30` }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: PART_COLORS[p], marginBottom: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{count}</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', opacity: 0.6 }}>{desc}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{count}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', opacity: 0.6 }}>{desc}</div>
               </div>
             ))}
           </div>
           {hasSpeech
             ? <div style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 8, padding: '8px 14px', marginBottom: 20, fontSize: 13, color: 'var(--accent-success)' }}><Mic size={13} /> Microphone available</div>
-            : <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '8px 14px', marginBottom: 20, fontSize: 13, color: '#F59E0B' }}>Voice not supported — use text input</div>
+            : <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, padding: '8px 14px', marginBottom: 20, fontSize: 13, color: '#AE5408' }}>Voice not supported — use text input</div>
           }
           {genError && (
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: 'var(--accent-danger)' }}>
@@ -527,7 +528,7 @@ export default function Speaking() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: PART_COLORS[currentPart] }} />
                   <span style={{ fontSize: 13, fontWeight: 700, color: PART_COLORS[currentPart] }}>{PART_LABELS[currentPart]}</span>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'Space Mono' }}>{questionLabel}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-score)' }}>{questionLabel}</span>
                 </div>
                 <button onClick={handleRestart} style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12 }}>
                   <RotateCcw size={12} /> Reset
@@ -537,24 +538,24 @@ export default function Speaking() {
               {/* Part 2: Cue card + prep */}
               {currentPart === 2 && (
                 <GlowCard style={{ padding: isMobile ? 16 : 22, marginBottom: 14 }} hover={false}>
-                  <div style={{ fontSize: 11, color: 'var(--accent-secondary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 10 }}>Cue Card</div>
+                  <div style={{ fontSize: 12, color: 'var(--accent-secondary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 10 }}>Cue Card</div>
                   <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 14, padding: '12px 14px', background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)', borderRadius: 10, lineHeight: 1.4 }}>
                     {questions.part2.topic}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>You should say:</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>You should say:</div>
                   {questions.part2.points?.map((pt, i) => (
                     <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 7, alignItems: 'flex-start' }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(6,182,212,0.15)', border: '1px solid rgba(6,182,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 10, fontWeight: 700, color: 'var(--accent-secondary)' }}>{i + 1}</div>
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(6,182,212,0.15)', border: '1px solid rgba(6,182,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: 'var(--accent-secondary)' }}>{i + 1}</div>
                       <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{pt}</span>
                     </div>
                   ))}
                   {(prepActive || !prepDone) && phase !== 'feedback' && (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-elevated)', borderRadius: 10, marginTop: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Clock size={14} style={{ color: '#F59E0B' }} />
+                        <Clock size={14} style={{ color: '#AE5408' }} />
                         <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Preparation time</span>
                       </div>
-                      <span style={{ fontFamily: 'Space Mono', fontSize: 22, fontWeight: 700, color: prepTimeLeft <= 10 ? 'var(--accent-danger)' : '#F59E0B' }}>
+                      <span style={{ fontFamily: 'var(--font-score)', fontSize: 22, fontWeight: 700, color: prepTimeLeft <= 10 ? 'var(--accent-danger)' : '#AE5408' }}>
                         0:{String(prepTimeLeft).padStart(2, '0')}
                       </span>
                     </div>
@@ -571,7 +572,7 @@ export default function Speaking() {
               {/* Question card (Part 1 & 3) */}
               {currentPart !== 2 && (
                 <GlowCard style={{ padding: isMobile ? 16 : 22, marginBottom: 14 }} hover={false}>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 10 }}>Question</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 10 }}>Question</div>
                   <p style={{ fontSize: isMobile ? 16 : 18, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.65 }}>
                     {currentQuestion?.question}
                   </p>
@@ -584,7 +585,7 @@ export default function Speaking() {
                   <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>Your Answer</span>
                     {hasSpeech && (
-                      <button onClick={() => setShowTextInput(v => !v)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11, textDecoration: 'underline' }}>
+                      <button onClick={() => setShowTextInput(v => !v)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12, textDecoration: 'underline' }}>
                         {showTextInput ? 'use voice' : 'type instead'}
                       </button>
                     )}
@@ -606,12 +607,12 @@ export default function Speaking() {
                         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {isRecording && (
                             <>
-                              <div style={{ position: 'absolute', width: 62, height: 62, borderRadius: '50%', border: '2px solid #EF4444', animation: 'ping1 1.2s ease-out infinite', pointerEvents: 'none' }} />
-                              <div style={{ position: 'absolute', width: 80, height: 80, borderRadius: '50%', border: '2px solid #EF4444', animation: 'ping2 1.2s ease-out infinite 0.4s', pointerEvents: 'none' }} />
+                              <div style={{ position: 'absolute', width: 62, height: 62, borderRadius: '50%', border: '2px solid #D5301F', animation: 'ping1 1.2s ease-out infinite', pointerEvents: 'none' }} />
+                              <div style={{ position: 'absolute', width: 80, height: 80, borderRadius: '50%', border: '2px solid #D5301F', animation: 'ping2 1.2s ease-out infinite 0.4s', pointerEvents: 'none' }} />
                             </>
                           )}
                           <button onClick={isRecording ? stopRecording : startRecording} disabled={isEvaluating}
-                            style={{ width: 56, height: 56, borderRadius: '50%', border: 'none', cursor: isEvaluating ? 'not-allowed' : 'pointer', background: isRecording ? 'linear-gradient(135deg, #EF4444, #DC2626)' : 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: isRecording ? '0 0 24px rgba(239,68,68,0.5)' : '0 0 24px rgba(6,182,212,0.3)', opacity: isEvaluating ? 0.5 : 1 }}>
+                            style={{ width: 56, height: 56, borderRadius: '50%', border: 'none', cursor: isEvaluating ? 'not-allowed' : 'pointer', background: isRecording ? 'linear-gradient(135deg, #D5301F, #DC2626)' : 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: isRecording ? '0 0 24px rgba(239,68,68,0.5)' : '0 0 24px rgba(6,182,212,0.3)', opacity: isEvaluating ? 0.5 : 1 }}>
                             {isRecording ? <MicOff size={22} color="white" /> : <Mic size={22} color="white" />}
                           </button>
                         </div>
@@ -621,26 +622,26 @@ export default function Speaking() {
                             const progress = Math.min(1, recordingSecs / target);
                             const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
                             const reached = recordingSecs >= target;
-                            const timerColor = reached ? 'var(--accent-success)' : recordingSecs >= target * 0.5 ? '#F59E0B' : 'var(--accent-danger)';
+                            const timerColor = reached ? 'var(--accent-success)' : recordingSecs >= target * 0.5 ? '#AE5408' : 'var(--accent-danger)';
                             return (
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                                 {/* Timer row */}
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <span style={{ fontSize: 13, fontWeight: 700, color: timerColor, fontFamily: 'Space Mono' }}>{fmt(recordingSecs)}</span>
-                                  <span style={{ fontSize: 11, color: reached ? 'var(--accent-success)' : 'var(--text-muted)' }}>
+                                  <span style={{ fontSize: 13, fontWeight: 700, color: timerColor, fontFamily: 'var(--font-score)' }}>{fmt(recordingSecs)}</span>
+                                  <span style={{ fontSize: 12, color: reached ? 'var(--accent-success)' : 'var(--text-muted)' }}>
                                     {reached ? '✓ Good length' : `~${fmt(target)} recommended`}
                                   </span>
                                 </div>
                                 {/* Duration progress bar */}
                                 <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                                  <div style={{ height: '100%', width: `${progress * 100}%`, borderRadius: 2, background: reached ? 'var(--accent-success)' : '#F59E0B', transition: 'width 0.9s linear, background 0.3s' }} />
+                                  <div style={{ height: '100%', width: `${progress * 100}%`, borderRadius: 2, background: reached ? 'var(--accent-success)' : '#AE5408', transition: 'width 0.9s linear, background 0.3s' }} />
                                 </div>
                                 {/* Audio level bars */}
                                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 22 }}>
                                   {audioLevels.map((level, i) => {
                                     const h = Math.max(3, Math.round(level * 22));
                                     return (
-                                      <div key={i} style={{ width: 4, height: h, borderRadius: 2, background: level > 0.5 ? '#EF4444' : level > 0.2 ? '#F59E0B' : 'rgba(239,68,68,0.35)', transition: 'height 80ms ease, background 80ms ease' }} />
+                                      <div key={i} style={{ width: 4, height: h, borderRadius: 2, background: level > 0.5 ? '#D5301F' : level > 0.2 ? '#AE5408' : 'rgba(239,68,68,0.35)', transition: 'height 80ms ease, background 80ms ease' }} />
                                     );
                                   })}
                                 </div>
@@ -681,6 +682,7 @@ export default function Speaking() {
                     </div>
                   )}
 
+                  {isEvaluating && <div style={{ margin: '0 14px 12px' }}><StagedLoader stages={SPEAKING_STAGES} note={null} /></div>}
                   {evalError && (
                     <div style={{ margin: '0 14px 12px', padding: '10px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, fontSize: 12, color: 'var(--accent-danger)', display: 'flex', gap: 7, alignItems: 'center' }}>
                       <AlertCircle size={13} /> {evalError}

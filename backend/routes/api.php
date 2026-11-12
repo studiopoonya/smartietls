@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AI\AIListeningController;
-use App\Http\Controllers\LessonController;
+use App\Http\Controllers\CurriculumController;
+use App\Http\Controllers\ErrorBankController;
+use App\Http\Controllers\ExamController;
+use App\Http\Controllers\GrammarController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\StudyPlanController;
-use App\Http\Controllers\AI\AIMockTestController;
 use App\Http\Controllers\AI\AIReadingController;
 use App\Http\Controllers\AI\AISpeakingController;
 use App\Http\Controllers\AI\AIVocabularyController;
@@ -16,6 +19,7 @@ use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VocabularyController;
+use App\Http\Controllers\WeaknessController;
 use Illuminate\Support\Facades\Route;
 
 // Auth (public)
@@ -37,9 +41,39 @@ Route::middleware('auth:sanctum')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // Lesson progress
-    Route::get('/lessons/progress', [LessonController::class, 'progress']);
-    Route::post('/lessons/{lessonId}/complete', [LessonController::class, 'complete']);
+    // Curriculum: Track > Module > Lesson > Drill > Evaluation > Error Log
+    Route::get('/curriculum', [CurriculumController::class, 'index']);
+    Route::get('/curriculum/lessons/{slug}', [CurriculumController::class, 'lesson']);
+    Route::get('/curriculum/lessons/{slug}/bahasa', [CurriculumController::class, 'lessonInBahasa']);
+    Route::post('/drills/{slug}/start', [CurriculumController::class, 'startDrill']);
+    Route::post('/drills/{slug}/next', [CurriculumController::class, 'nextBlock']);
+    Route::post('/drills/{slug}/submit', [CurriculumController::class, 'submitDrill']);
+
+    // Phase 3: Active Correction Loop
+    Route::get('/error-bank', [ErrorBankController::class, 'index']);
+    Route::post('/error-bank/{entry}/practice', [ErrorBankController::class, 'practice']);
+    Route::post('/rewrite-challenges/{challenge}/submit', [ErrorBankController::class, 'submitRewrite']);
+    Route::post('/weakness-practice', [WeaknessController::class, 'start']);
+    Route::post('/weakness-practice/{drill}/submit', [WeaknessController::class, 'submit']);
+
+    // Phase 4: Full-Scale Exam Conditioning
+    Route::get('/exam', [ExamController::class, 'status']);
+    Route::post('/exam', [ExamController::class, 'start']);
+    Route::post('/exam/{exam}/prepare', [ExamController::class, 'prepare']);
+    Route::post('/exam/{exam}/save', [ExamController::class, 'save']);
+    Route::post('/exam/{exam}/stage', [ExamController::class, 'submitStage']);
+    Route::post('/exam/{exam}/abandon', [ExamController::class, 'abandon']);
+    Route::post('/exam/{exam}/finalize', [ExamController::class, 'finalize']);
+
+    // Grammar Lab
+    Route::get('/grammar', [GrammarController::class, 'index']);
+    Route::post('/grammar/check', [GrammarController::class, 'check']);
+
+    // Open-access journal reader
+    Route::middleware('throttle:40,1')->group(function () {
+        Route::get('/journals', [JournalController::class, 'search']);
+        Route::get('/journals/{id}', [JournalController::class, 'show']);
+    });
 
     // Study plan
     Route::get('/study-plan', [StudyPlanController::class, 'show']);
@@ -57,7 +91,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/reading/generate', [AIReadingController::class, 'generate']);
         Route::post('/listening/generate', [AIListeningController::class, 'generate']);
         Route::post('/vocabulary/explain', [AIVocabularyController::class, 'explain']);
-        Route::post('/mock-test/evaluate', [AIMockTestController::class, 'evaluate']);
     });
 
     // Data endpoints

@@ -28,7 +28,3 @@ export const useListeningGenerate = () => useMutation({
 export const useVocabExplain = () => useMutation({
   mutationFn: (data) => api.post('/ai/vocabulary/explain', data).then(r => r.data),
 });
-
-export const useMockTestEvaluate = () => useMutation({
-  mutationFn: (data) => api.post('/ai/mock-test/evaluate', data).then(r => r.data),
-});

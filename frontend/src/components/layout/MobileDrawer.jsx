@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Settings, Lightbulb, GraduationCap } from 'lucide-react';
+import { X, LayoutDashboard, PenLine, Mic2, BookOpen, Headphones, FlaskConical, BookMarked, TrendingUp, LogOut, Settings, Lightbulb, GraduationCap, Map, RotateCcw, Library, SpellCheck } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLogout } from '../../hooks/useAuth';
 import logo from '../../assets/logo-removebg-preview.png';
@@ -8,13 +8,17 @@ import logo from '../../assets/logo-removebg-preview.png';
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { label: 'LEARN', isHeader: true },
+  { to: '/learn', end: true, icon: Map, label: 'Learning Path' },
   { to: '/learn/writing', icon: PenLine, label: 'Writing' },
   { to: '/learn/speaking', icon: Mic2, label: 'Speaking' },
   { to: '/learn/reading', icon: BookOpen, label: 'Reading' },
   { to: '/learn/listening', icon: Headphones, label: 'Listening' },
+  { to: '/grammar', icon: SpellCheck, label: 'Grammar Lab' },
   { label: 'TOOLS', isHeader: true },
-  { to: '/mock-test', icon: FlaskConical, label: 'Mock Test' },
+  { to: '/error-bank', icon: RotateCcw, label: 'Error Bank' },
+  { to: '/mock-test', icon: FlaskConical, label: 'Exam Simulation' },
   { to: '/vocabulary', icon: BookMarked, label: 'Vocabulary' },
+  { to: '/journals', icon: Library, label: 'Journals' },
   { to: '/progress', icon: TrendingUp, label: 'Progress' },
   { to: '/tips', icon: Lightbulb, label: 'Tips & Tricks' },
   { to: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
@@ -70,10 +74,10 @@ export default function MobileDrawer({ open, onClose }) {
             <nav style={{ flex: 1, padding: '8px 12px' }}>
               {navItems.filter(item => !item.adminOnly || user?.is_admin).map((item, i) => {
                 if (item.isHeader) return (
-                  <div key={i} style={{ padding: '16px 8px 6px', fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: 'Space Grotesk' }}>{item.label}</div>
+                  <div key={i} style={{ padding: '16px 8px 6px', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', fontFamily: 'var(--font-display)' }}>{item.label}</div>
                 );
                 return (
-                  <NavLink key={item.to} to={item.to} onClick={onClose} style={({ isActive }) => ({
+                  <NavLink key={item.to} to={item.to} end={item.end} onClick={onClose} style={({ isActive }) => ({
                     display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 10,
                     marginBottom: 2, textDecoration: 'none', fontSize: 15, fontWeight: 500,
                     color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',

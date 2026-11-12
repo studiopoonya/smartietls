@@ -29,7 +29,7 @@ export default function AdminLayout() {
             <div style={{ width: 30, height: 30, borderRadius: 8, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Shield size={14} color="white" />
             </div>
-            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>Admin Panel</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>Admin Panel</span>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={toggleTheme} style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)' }}>
@@ -55,7 +55,7 @@ export default function AdminLayout() {
                     <div style={{ width: 32, height: 32, borderRadius: 9, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Shield size={15} color="white" />
                     </div>
-                    <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 15 }}>Admin Panel</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15 }}>Admin Panel</span>
                   </div>
                   <button onClick={() => setMenuOpen(false)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}>
                     <X size={15} />
@@ -68,7 +68,7 @@ export default function AdminLayout() {
                   </div>
                   <div style={{ overflow: 'hidden' }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600 }}>Administrator</div>
+                    <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600 }}>Administrator</div>
                   </div>
                 </div>
 
@@ -119,7 +119,7 @@ export default function AdminLayout() {
               <Shield size={16} color="white" />
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--text-primary)', lineHeight: 1.2 }}>Admin Panel</div>
+              <div style={{ fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--text-primary)', lineHeight: 1.2 }}>Admin Panel</div>
               <img src={logo} alt="Smart IELTS" style={{ height: 14, objectFit: 'contain', marginTop: 2 }} />
             </div>
           </div>
@@ -156,8 +156,8 @@ export default function AdminLayout() {
               {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
             </button>
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, fontFamily: 'Space Grotesk', marginBottom: 2 }}>{user?.name}</div>
-          <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600 }}>Administrator</div>
+          <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, fontFamily: 'var(--font-display)', marginBottom: 2 }}>{user?.name}</div>
+          <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600 }}>Administrator</div>
         </div>
       </div>
 

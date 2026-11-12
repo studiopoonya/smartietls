@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect } from 'react';
 import { useAppStore } from './store/useAppStore';
@@ -15,10 +15,15 @@ const Writing = lazy(() => import('./pages/learn/Writing'));
 const Speaking = lazy(() => import('./pages/learn/Speaking'));
 const Reading = lazy(() => import('./pages/learn/Reading'));
 const Listening = lazy(() => import('./pages/learn/Listening'));
+const LearningPath = lazy(() => import('./pages/learn/LearningPath'));
+const ErrorBank = lazy(() => import('./pages/ErrorBank'));
 const CurriculumPage = lazy(() => import('./pages/learn/CurriculumPage'));
 const LessonView = lazy(() => import('./pages/learn/LessonView'));
 const MockTest = lazy(() => import('./pages/MockTest'));
 const Vocabulary    = lazy(() => import('./pages/Vocabulary'));
+const Journals      = lazy(() => import('./pages/Journals'));
+const GrammarLab    = lazy(() => import('./pages/GrammarLab'));
+const JournalReader = lazy(() => import('./pages/JournalReader'));
 const Progress      = lazy(() => import('./pages/Progress'));
 const Tips            = lazy(() => import('./pages/Tips'));
 const Scholarships    = lazy(() => import('./pages/Scholarships'));
@@ -38,7 +43,7 @@ const queryClient = new QueryClient({
 function ThemeApplier() {
   const theme = useAppStore(s => s.theme);
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme ?? 'dark');
+    document.documentElement.setAttribute('data-theme', theme ?? 'light');
   }, [theme]);
   return null;
 }
@@ -61,10 +66,10 @@ function Protected({ children }) {
   return children;
 }
 
-function AuthRequired({ children }) {
+function AuthRequired() {
   const isAuthenticated = useAppStore(s => s.isAuthenticated);
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return children;
+  return <Outlet />;
 }
 
 function AdminGuard({ children }) {
@@ -92,6 +97,8 @@ export default function App() {
             </Route>
             <Route element={<Protected><AppLayout /></Protected>}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/learn" element={<LearningPath />} />
+              <Route path="/error-bank" element={<ErrorBank />} />
               <Route path="/learn/:skill" element={<CurriculumPage />} />
               <Route path="/learn/:skill/lesson/:lessonId" element={<LessonView />} />
               <Route path="/learn/writing/practice" element={<Writing />} />
@@ -100,6 +107,9 @@ export default function App() {
               <Route path="/learn/listening/practice" element={<Listening />} />
               <Route path="/mock-test" element={<MockTest />} />
               <Route path="/vocabulary" element={<Vocabulary />} />
+              <Route path="/journals" element={<Journals />} />
+              <Route path="/grammar" element={<GrammarLab />} />
+              <Route path="/journals/:id" element={<JournalReader />} />
               <Route path="/progress" element={<Progress />} />
               <Route path="/tips" element={<Tips />} />
               <Route path="/scholarships" element={<Scholarships />} />

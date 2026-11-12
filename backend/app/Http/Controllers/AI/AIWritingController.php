@@ -4,13 +4,14 @@ namespace App\Http\Controllers\AI;
 
 use App\Http\Controllers\Controller;
 use App\Services\ClaudeService;
+use App\Services\ErrorBank;
 use App\Services\Prompts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AIWritingController extends Controller
 {
-    public function __construct(private ClaudeService $claude) {}
+    public function __construct(private ClaudeService $claude, private ErrorBank $errors) {}
 
     public function analyze(Request $request): JsonResponse
     {
@@ -31,10 +32,13 @@ class AIWritingController extends Controller
         try {
             $result = $this->claude->getJson(
                 $apiKey,
-                Prompts::WRITING_EVALUATOR,
+                Prompts::forLearner(Prompts::WRITING_EVALUATOR, $user),
                 $userMessage,
                 3000
             );
+
+            ErrorBank::safely(fn () => $this->errors->captureEssay($user, $result));
+
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);

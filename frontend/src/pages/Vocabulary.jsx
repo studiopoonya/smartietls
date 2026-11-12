@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookMarked, Search, Plus, Trash2, RefreshCw, X, Brain, CheckCircle2, XCircle, RotateCcw, ChevronRight } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -42,8 +43,8 @@ function LookupPanel({ word, setWord, onSubmit, isPending, definition, saving, o
             {/* Word header */}
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
-                <span style={{ fontFamily: 'Space Grotesk', fontSize: 26, fontWeight: 700, color: 'var(--text-primary)' }}>{definition.word}</span>
-                <span className="badge badge-purple" style={{ fontSize: 10 }}>{definition.bandLevel}</span>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--text-primary)' }}>{definition.word}</span>
+                <span className="badge badge-purple" style={{ fontSize: 12 }}>{definition.bandLevel}</span>
               </div>
               <span style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', background: 'var(--bg-elevated)', padding: '2px 8px', borderRadius: 6 }}>
                 {definition.partOfSpeech}
@@ -57,12 +58,12 @@ function LookupPanel({ word, setWord, onSubmit, isPending, definition, saving, o
 
             {/* 3 Example sentences */}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Example Sentences
               </div>
               {(definition.examples ?? (definition.exampleSentence ? [definition.exampleSentence] : [])).map((ex, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
-                  <span style={{ fontFamily: 'Space Mono', fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', flexShrink: 0, marginTop: 2 }}>{i + 1}.</span>
+                  <span style={{ fontFamily: 'var(--font-score)', fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)', flexShrink: 0, marginTop: 2 }}>{i + 1}.</span>
                   <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, fontStyle: 'italic', margin: 0 }}>"{ex}"</p>
                 </div>
               ))}
@@ -71,7 +72,7 @@ function LookupPanel({ word, setWord, onSubmit, isPending, definition, saving, o
             {/* IELTS tip */}
             {definition.ieltsUsage && (
               <div style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 8, padding: '10px 12px', marginBottom: 14 }}>
-                <div style={{ fontSize: 10, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 3, textTransform: 'uppercase' }}>IELTS Tip</div>
+                <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 3, textTransform: 'uppercase' }}>IELTS Tip</div>
                 <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>{definition.ieltsUsage}</p>
               </div>
             )}
@@ -81,7 +82,7 @@ function LookupPanel({ word, setWord, onSubmit, isPending, definition, saving, o
               <div style={{ display: 'flex', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
                 {definition.synonyms?.length > 0 && (
                   <div style={{ flex: 1, minWidth: 120 }}>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Synonyms</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Synonyms</div>
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
                       {definition.synonyms.slice(0, 4).map((s, i) => <span key={i} className="badge badge-purple">{s}</span>)}
                     </div>
@@ -89,7 +90,7 @@ function LookupPanel({ word, setWord, onSubmit, isPending, definition, saving, o
                 )}
                 {definition.antonyms?.length > 0 && (
                   <div style={{ flex: 1, minWidth: 120 }}>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Antonyms</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Antonyms</div>
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
                       {definition.antonyms.slice(0, 4).map((a, i) => <span key={i} className="badge badge-cyan">{a}</span>)}
                     </div>
@@ -101,10 +102,10 @@ function LookupPanel({ word, setWord, onSubmit, isPending, definition, saving, o
             {/* Collocations */}
             {definition.collocations?.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Common Collocations</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase' }}>Common Collocations</div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {definition.collocations.map((c, i) => (
-                    <span key={i} style={{ fontSize: 11, padding: '3px 9px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'Space Mono' }}>{c}</span>
+                    <span key={i} style={{ fontSize: 12, padding: '3px 9px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-score)' }}>{c}</span>
                   ))}
                 </div>
               </div>
@@ -160,8 +161,8 @@ function FlashcardMode({ words, onClose }) {
       <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-secondary)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
-          <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 15 }}>Flashcard Practice</span>
-          {!done && <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'Space Mono' }}>{idx + 1} / {total}</span>}
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15 }}>Flashcard Practice</span>
+          {!done && <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-score)' }}>{idx + 1} / {total}</span>}
         </div>
         <button onClick={onClose} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}>
           <X size={16} />
@@ -180,15 +181,15 @@ function FlashcardMode({ words, onClose }) {
           /* ── Summary ── */
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', textAlign: 'center' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-            <h2 style={{ fontSize: 22, fontFamily: 'Space Grotesk', marginBottom: 8 }}>Session Complete!</h2>
+            <h2 style={{ fontSize: 22, fontFamily: 'var(--font-display)', marginBottom: 8 }}>Session Complete!</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28 }}>You went through {words.length} word{words.length !== 1 ? 's' : ''}</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
               <div style={{ padding: '20px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 14, textAlign: 'center' }}>
-                <div style={{ fontFamily: 'Space Mono', fontSize: 36, fontWeight: 700, color: 'var(--accent-success)' }}>{known}</div>
+                <div style={{ fontFamily: 'var(--font-score)', fontSize: 36, fontWeight: 700, color: 'var(--accent-success)' }}>{known}</div>
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Known</div>
               </div>
               <div style={{ padding: '20px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 14, textAlign: 'center' }}>
-                <div style={{ fontFamily: 'Space Mono', fontSize: 36, fontWeight: 700, color: 'var(--accent-danger)' }}>{unknown}</div>
+                <div style={{ fontFamily: 'var(--font-score)', fontSize: 36, fontWeight: 700, color: 'var(--accent-danger)' }}>{unknown}</div>
                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Still Learning</div>
               </div>
             </div>
@@ -218,7 +219,7 @@ function FlashcardMode({ words, onClose }) {
                 style={{ position: 'relative', transformStyle: 'preserve-3d', minHeight: 260 }}>
                 {/* Front */}
                 <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, boxShadow: '0 8px 40px rgba(0,0,0,0.25)' }}>
-                  <div style={{ fontFamily: 'Space Grotesk', fontSize: 42, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10, textAlign: 'center' }}>{card.word}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 42, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10, textAlign: 'center' }}>{card.word}</div>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>{card.definition_data?.partOfSpeech}</div>
                   <div style={{ marginTop: 24, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 5, opacity: 0.6 }}>
                     <span>Tap to reveal definition</span>
@@ -226,13 +227,13 @@ function FlashcardMode({ words, onClose }) {
                 </div>
                 {/* Back */}
                 <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06))', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 20, padding: '24px 26px', boxShadow: '0 8px 40px rgba(124,58,237,0.15)', overflowY: 'auto' }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--accent-primary)', marginBottom: 10 }}>{card.word}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--accent-primary)', marginBottom: 10 }}>{card.word}</div>
                   <p style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.75, marginBottom: 14, paddingLeft: 12, borderLeft: '3px solid var(--accent-primary)' }}>
                     {card.definition_data?.definition}
                   </p>
                   {card.definition_data?.examples?.slice(0, 2).map((ex, i) => (
                     <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 7 }}>
-                      <span style={{ fontFamily: 'Space Mono', fontSize: 11, fontWeight: 700, color: 'var(--accent-secondary)', flexShrink: 0, marginTop: 2 }}>{i + 1}.</span>
+                      <span style={{ fontFamily: 'var(--font-score)', fontSize: 12, fontWeight: 700, color: 'var(--accent-secondary)', flexShrink: 0, marginTop: 2 }}>{i + 1}.</span>
                       <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>"{ex}"</p>
                     </div>
                   ))}
@@ -278,7 +279,7 @@ export default function Vocabulary() {
   const [showFlashcard, setShowFlashcard] = useState(false);
   const isMobile  = useIsMobile();
   const qc        = useQueryClient();
-  const { mutate: explain, isPending } = useVocabExplain();
+  const { mutate: explain, mutateAsync: explainAsync, isPending } = useVocabExplain();
   const pad = isMobile ? '20px 16px' : '36px 40px';
 
   const { data: vocab, isLoading } = useQuery({
@@ -307,6 +308,21 @@ export default function Vocabulary() {
     explain({ word: word.trim() }, { onSuccess: setDefinition });
   };
 
+  // A word sent from the journal reader is looked up straight away, once.
+  const [params, setParams] = useSearchParams();
+  const incomingRef = useRef(false);
+  useEffect(() => {
+    const incoming = params.get('word')?.trim().slice(0, 100);
+    if (!incoming || incomingRef.current) return;
+    incomingRef.current = true;
+    setWord(incoming);
+    setDefinition(null);
+    setShowLookup(true);
+    setParams({}, { replace: true });
+    // mutateAsync resolves even if the page remounts meanwhile, unlike a callback passed to mutate().
+    explainAsync({ word: incoming }).then(setDefinition).catch(() => {});
+  }, [params, setParams, explainAsync]);
+
   const handleSave = async () => {
     if (!definition) return;
     setSaving(true);
@@ -322,7 +338,7 @@ export default function Vocabulary() {
   const flashWords = allVocab?.data ?? vocab?.data ?? [];
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1100, margin: '0 auto' }}>
       {/* Flashcard overlay */}
       <AnimatePresence>
         {showFlashcard && flashWords.length > 0 && (
@@ -331,7 +347,7 @@ export default function Vocabulary() {
       </AnimatePresence>
 
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <BookMarked size={16} style={{ color: 'var(--accent-primary)' }} />
@@ -344,7 +360,7 @@ export default function Vocabulary() {
           <div style={{ display: 'flex', gap: 8 }}>
             {(vocab?.total ?? 0) > 0 && (
               <button onClick={() => setShowFlashcard(true)}
-                style={{ padding: '9px 14px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 10, color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: 600, fontFamily: 'Space Grotesk' }}>
+                style={{ padding: '9px 14px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 10, color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: 600, fontFamily: 'var(--font-display)' }}>
                 <Brain size={14} /> {isMobile ? 'Flashcards' : 'Practice Flashcards'}
               </button>
             )}
@@ -387,7 +403,7 @@ export default function Vocabulary() {
         {!isMobile && (
           <div>
             <GlowCard hover={false} style={{ padding: 22 }}>
-              <h3 style={{ fontSize: 15, marginBottom: 4, fontFamily: 'Space Grotesk' }}>Dictionary</h3>
+              <h3 style={{ fontSize: 15, marginBottom: 4, fontFamily: 'var(--font-display)' }}>Dictionary</h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>Search any word for definition + 3 example sentences</p>
               <LookupPanel
                 word={word} setWord={setWord}
@@ -402,7 +418,7 @@ export default function Vocabulary() {
         <div>
           {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <h2 style={{ fontSize: 17, fontFamily: 'Space Grotesk' }}>Saved Words</h2>
+              <h2 style={{ fontSize: 17, fontFamily: 'var(--font-display)' }}>Saved Words</h2>
               <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{vocab?.total ?? 0} words</span>
             </div>
           )}
@@ -426,8 +442,8 @@ export default function Vocabulary() {
                 <motion.div key={v.id} style={{ padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
                   {/* Word + badge + actions row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontFamily: 'Space Grotesk', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{v.word}</span>
-                    <span className="badge badge-purple" style={{ fontSize: 9 }}>{v.definition_data?.bandLevel}</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{v.word}</span>
+                    <span className="badge badge-purple" style={{ fontSize: 12 }}>{v.definition_data?.bandLevel}</span>
                     <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexShrink: 0 }}>
                       <button onClick={() => reviewMutation.mutate(v.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-success)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <RefreshCw size={12} />
@@ -438,7 +454,7 @@ export default function Vocabulary() {
                     </div>
                   </div>
                   {/* Part of speech */}
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: 4 }}>{v.definition_data?.partOfSpeech}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: 4 }}>{v.definition_data?.partOfSpeech}</div>
                   {/* Definition — 2 lines max */}
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: v.definition_data?.synonyms?.length ? 8 : 0 }}>
                     {v.definition_data?.definition}
@@ -446,7 +462,7 @@ export default function Vocabulary() {
                   {v.definition_data?.synonyms?.length > 0 && (
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
                       {v.definition_data.synonyms.slice(0, 3).map((s, i) => (
-                        <span key={i} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: 'rgba(124,58,237,0.12)', color: 'var(--accent-glow)', border: '1px solid rgba(124,58,237,0.2)', fontWeight: 500 }}>{s}</span>
+                        <span key={i} style={{ fontSize: 12, padding: '2px 7px', borderRadius: 20, background: 'rgba(124,58,237,0.12)', color: 'var(--accent-glow)', border: '1px solid rgba(124,58,237,0.2)', fontWeight: 500 }}>{s}</span>
                       ))}
                     </div>
                   )}
@@ -455,10 +471,10 @@ export default function Vocabulary() {
                 <motion.div key={v.id} className="glow-card" style={{ padding: 16 }} whileHover={{ y: -2 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
                     <div>
-                      <div style={{ fontFamily: 'Space Grotesk', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{v.word}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>{v.definition_data?.partOfSpeech}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{v.word}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic' }}>{v.definition_data?.partOfSpeech}</div>
                     </div>
-                    <span className="badge badge-purple" style={{ fontSize: 9 }}>{v.definition_data?.bandLevel}</span>
+                    <span className="badge badge-purple" style={{ fontSize: 12 }}>{v.definition_data?.bandLevel}</span>
                   </div>
                   <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: v.definition_data?.synonyms?.length ? 8 : 10 }}>
                     {v.definition_data?.definition?.slice(0, 90)}{v.definition_data?.definition?.length > 90 ? '...' : ''}
@@ -466,12 +482,12 @@ export default function Vocabulary() {
                   {v.definition_data?.synonyms?.length > 0 && (
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
                       {v.definition_data.synonyms.slice(0, 3).map((s, i) => (
-                        <span key={i} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 20, background: 'rgba(124,58,237,0.12)', color: 'var(--accent-glow)', border: '1px solid rgba(124,58,237,0.2)', fontWeight: 500 }}>{s}</span>
+                        <span key={i} style={{ fontSize: 12, padding: '2px 7px', borderRadius: 20, background: 'rgba(124,58,237,0.12)', color: 'var(--accent-glow)', border: '1px solid rgba(124,58,237,0.2)', fontWeight: 500 }}>{s}</span>
                       ))}
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: 7 }}>
-                    <button onClick={() => reviewMutation.mutate(v.id)} style={{ flex: 1, padding: '6px', borderRadius: 7, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-success)', cursor: 'pointer', fontSize: 10, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <button onClick={() => reviewMutation.mutate(v.id)} style={{ flex: 1, padding: '6px', borderRadius: 7, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-success)', cursor: 'pointer', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
                       <RefreshCw size={10} /> Done ({v.review_count})
                     </button>
                     <button onClick={() => deleteMutation.mutate(v.id)} style={{ padding: '6px 9px', borderRadius: 7, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-danger)', cursor: 'pointer' }}>

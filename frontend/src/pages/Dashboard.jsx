@@ -9,18 +9,21 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import GlowCard from '../components/common/GlowCard';
 import BandScoreBar from '../components/common/BandScoreBar';
 import { getBandColor, formatDate } from '../lib/utils';
+import { useCurriculum } from '../hooks/useCurriculum';
+import { nextAvailableLesson } from '../data/skills';
+import { BaselineCard } from './learn/LearningPath';
 
 const modules = [
-  { to: '/learn/writing', icon: PenLine, label: 'Writing', color: 'var(--accent-primary)', desc: 'Task 1 & 2 feedback' },
-  { to: '/learn/speaking', icon: Mic2, label: 'Speaking', color: 'var(--accent-secondary)', desc: 'Part 1, 2 & 3' },
-  { to: '/learn/reading', icon: BookOpen, label: 'Reading', color: 'var(--accent-success)', desc: 'Academic passages' },
-  { to: '/learn/listening', icon: Headphones, label: 'Listening', color: '#F59E0B', desc: 'Transcripts & Q&A' },
+  { to: '/learn/writing', icon: PenLine, label: 'Writing', color: '#6A35E8', desc: 'Task 1 & 2 feedback' },
+  { to: '/learn/speaking', icon: Mic2, label: 'Speaking', color: '#0A7A9E', desc: 'Part 1, 2 & 3' },
+  { to: '/learn/reading', icon: BookOpen, label: 'Reading', color: '#0A7F5C', desc: 'Academic passages' },
+  { to: '/learn/listening', icon: Headphones, label: 'Listening', color: '#AE5408', desc: 'Transcripts & Q&A' },
 ];
 
 const tools = [
-  { to: '/mock-test', icon: FlaskConical, label: 'Mock Test', color: 'var(--accent-danger)' },
-  { to: '/vocabulary', icon: BookMarked, label: 'Vocabulary', color: 'var(--accent-primary)' },
-  { to: '/progress', icon: TrendingUp, label: 'Progress', color: 'var(--accent-success)' },
+  { to: '/mock-test', icon: FlaskConical, label: 'Exam Simulation', color: '#D5301F' },
+  { to: '/vocabulary', icon: BookMarked, label: 'Vocabulary', color: '#6A35E8' },
+  { to: '/progress', icon: TrendingUp, label: 'Progress', color: '#0A7F5C' },
 ];
 
 export default function Dashboard() {
@@ -32,6 +35,8 @@ export default function Dashboard() {
     queryFn: () => api.get('/study-plan').then(r => r.data.plan),
     enabled: !!storeUser?.study_weeks,
   });
+  const { data: curriculum } = useCurriculum();
+  const nextLesson = nextAvailableLesson(curriculum);
   const pad = isMobile ? '20px 16px' : '36px 40px';
 
   if (isLoading) return (
@@ -51,7 +56,7 @@ export default function Dashboard() {
     : null;
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1200 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 1200, margin: '0 auto' }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         {!isMobile ? (
@@ -62,13 +67,13 @@ export default function Dashboard() {
             </div>
             <div style={{ display: 'flex', gap: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 10, padding: '10px 16px' }}>
-                <Flame size={18} style={{ color: '#F59E0B' }} />
-                <span style={{ fontFamily: 'Space Mono', fontWeight: 700, fontSize: 16, color: '#F59E0B' }}>{user?.streak_days ?? 0}</span>
+                <Flame size={18} style={{ color: '#AE5408' }} />
+                <span style={{ fontFamily: 'var(--font-score)', fontWeight: 700, fontSize: 16, color: '#AE5408' }}>{user?.streak_days ?? 0}</span>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>day streak</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 10, padding: '10px 16px' }}>
                 <Target size={16} style={{ color: 'var(--accent-glow)' }} />
-                <span style={{ fontFamily: 'Space Mono', fontWeight: 700, fontSize: 16, color: 'var(--accent-glow)' }}>Band {user?.target_band ?? 7}</span>
+                <span style={{ fontFamily: 'var(--font-score)', fontWeight: 700, fontSize: 16, color: 'var(--accent-glow)' }}>Band {user?.target_band ?? 7}</span>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>goal</span>
               </div>
             </div>
@@ -82,11 +87,11 @@ export default function Dashboard() {
       </motion.div>
 
       {/* No API key warning — admin only */}
-      {storeUser?.is_admin && !user?.has_api_key && (
+      {storeUser?.is_admin && user && user.ai_ready === false && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', gap: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
-          <AlertCircle size={16} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 1 }} />
+          <AlertCircle size={16} style={{ color: '#AE5408', flexShrink: 0, marginTop: 1 }} />
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#F59E0B', marginBottom: 3 }}>API key not configured</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#AE5408', marginBottom: 3 }}>API key not configured</div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
               <Link to="/setup" style={{ color: 'var(--accent-secondary)', textDecoration: 'none', fontWeight: 600 }}>Set up your Anthropic API key →</Link>
             </div>
@@ -101,7 +106,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: planData.on_track ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {planData.finished ? <CheckCircle size={18} style={{ color: 'var(--accent-success)' }} /> : planData.on_track ? <Zap size={18} style={{ color: 'var(--accent-success)' }} /> : <Flame size={18} style={{ color: '#F59E0B' }} />}
+                {planData.finished ? <CheckCircle size={18} style={{ color: 'var(--accent-success)' }} /> : planData.on_track ? <Zap size={18} style={{ color: 'var(--accent-success)' }} /> : <Flame size={18} style={{ color: '#AE5408' }} />}
               </div>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
@@ -109,7 +114,7 @@ export default function Dashboard() {
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                   {planData.finished
-                    ? 'Try the Mock Test to test your full band score.'
+                    ? 'Take the Exam Simulation to test your full band score.'
                     : planData.on_track
                       ? `On track! ${planData.completed_lessons}/${planData.total_lessons} lessons done.`
                       : `${planData.expected_lessons - planData.completed_lessons} lesson(s) behind — let's catch up today!`}
@@ -117,25 +122,37 @@ export default function Dashboard() {
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, minWidth: 100 }}>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'Space Mono' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-score)' }}>
                 {planData.completed_lessons}/{planData.total_lessons} lessons
               </div>
               <div style={{ width: 100, height: 5, background: 'var(--border)', borderRadius: 99, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.round(planData.completed_lessons / planData.total_lessons * 100)}%`, background: planData.on_track ? 'var(--accent-success)' : '#F59E0B', borderRadius: 99, transition: 'width 0.5s' }} />
+                <div style={{ height: '100%', width: `${Math.round(planData.completed_lessons / planData.total_lessons * 100)}%`, background: planData.on_track ? 'var(--accent-success)' : '#AE5408', borderRadius: 99, transition: 'width 0.5s' }} />
               </div>
             </div>
           </div>
         </motion.div>
       )}
 
+      {/* Learning path: next step and baseline */}
+      {curriculum && (
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 12 : 16, marginBottom: 20 }}>
+          <Link to={curriculum.gates.pendingRewrite ? '/error-bank' : nextLesson ? `/learn/${nextLesson.skill}/lesson/${nextLesson.slug}` : '/learn'} className="glow-card" style={{ padding: 18, textDecoration: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: curriculum.gates.pendingRewrite ? 'var(--accent-warning)' : 'var(--accent-glow)', letterSpacing: '0.06em', marginBottom: 6 }}>{curriculum.gates.pendingRewrite ? 'ACTION REQUIRED' : 'NEXT STEP'}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginBottom: 3 }}>{curriculum.gates.pendingRewrite ? 'Complete your Rewrite Challenge' : nextLesson?.title ?? 'View your Learning Path'}</div>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{curriculum.gates.pendingRewrite?.moduleTitle ?? nextLesson?.moduleTitle ?? 'All available lessons are done'}</div>
+          </Link>
+          <BaselineCard baseline={curriculum.baseline} />
+        </div>
+      )}
+
       {/* Exam countdown */}
       {daysToExam !== null && daysToExam > 0 && (
         <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
           style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', marginBottom: 20, borderRadius: 14, background: daysToExam <= 14 ? 'rgba(239,68,68,0.08)' : daysToExam <= 30 ? 'rgba(245,158,11,0.08)' : 'rgba(124,58,237,0.08)', border: `1px solid ${daysToExam <= 14 ? 'rgba(239,68,68,0.25)' : daysToExam <= 30 ? 'rgba(245,158,11,0.25)' : 'rgba(124,58,237,0.25)'}` }}>
-          <CalendarDays size={22} style={{ color: daysToExam <= 14 ? 'var(--accent-danger)' : daysToExam <= 30 ? '#F59E0B' : 'var(--accent-primary)', flexShrink: 0 }} />
+          <CalendarDays size={22} style={{ color: daysToExam <= 14 ? 'var(--accent-danger)' : daysToExam <= 30 ? '#AE5408' : 'var(--accent-primary)', flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-              <span style={{ fontFamily: 'Space Mono', fontSize: 20, color: daysToExam <= 14 ? 'var(--accent-danger)' : daysToExam <= 30 ? '#F59E0B' : 'var(--accent-primary)' }}>{daysToExam}</span>
+              <span style={{ fontFamily: 'var(--font-score)', fontSize: 20, color: daysToExam <= 14 ? 'var(--accent-danger)' : daysToExam <= 30 ? '#AE5408' : 'var(--accent-primary)' }}>{daysToExam}</span>
               {' '}days until your IELTS exam
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
@@ -145,7 +162,7 @@ export default function Dashboard() {
                 : 'You have time — build strong habits now.'}
             </div>
           </div>
-          <Link to="/setup" style={{ fontSize: 11, color: 'var(--text-muted)', textDecoration: 'none', flexShrink: 0, padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7 }}>Edit date</Link>
+          <Link to="/setup" style={{ fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none', flexShrink: 0, padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7 }}>Edit date</Link>
         </motion.div>
       )}
 
@@ -160,10 +177,10 @@ export default function Dashboard() {
           <motion.div key={s.label} className="glow-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
             style={{ padding: isMobile ? '14px 16px' : '20px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <s.icon size={13} style={{ color: s.flame ? '#F59E0B' : 'var(--text-muted)' }} />
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{s.label}</span>
+              <s.icon size={13} style={{ color: s.flame ? '#AE5408' : 'var(--text-muted)' }} />
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{s.label}</span>
             </div>
-            <div style={{ fontFamily: s.mono ? 'Space Mono' : 'Space Grotesk', fontSize: isMobile ? 22 : 26, fontWeight: 700, color: s.colored ? getBandColor(s.value) : s.flame ? '#F59E0B' : 'var(--text-primary)' }}>
+            <div style={{ fontFamily: s.mono ? 'var(--font-score)' : 'var(--font-display)', fontSize: isMobile ? 22 : 26, fontWeight: 700, color: s.colored ? getBandColor(s.value) : s.flame ? '#AE5408' : 'var(--text-primary)' }}>
               {s.value}
             </div>
           </motion.div>
@@ -173,7 +190,7 @@ export default function Dashboard() {
       {/* Main content: modules + bands */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 300px', gap: isMobile ? 16 : 24, marginBottom: 24, alignItems: 'start' }}>
         <div>
-          <h2 style={{ fontSize: isMobile ? 15 : 17, marginBottom: 12, fontFamily: 'Space Grotesk' }}>Practice Modules</h2>
+          <h2 style={{ fontSize: isMobile ? 15 : 17, marginBottom: 12, fontFamily: 'var(--font-display)' }}>Practice Modules</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 10 : 14 }}>
             {modules.map((m, i) => (
               <motion.div key={m.to} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.08 }}>
@@ -182,12 +199,12 @@ export default function Dashboard() {
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: `${m.color}20`, border: `1px solid ${m.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
                       <m.icon size={16} style={{ color: m.color }} />
                     </div>
-                    <div style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, fontFamily: 'Space Grotesk', marginBottom: 3, color: 'var(--text-primary)' }}>{m.label}</div>
+                    <div style={{ fontSize: isMobile ? 14 : 15, fontWeight: 700, fontFamily: 'var(--font-display)', marginBottom: 3, color: 'var(--text-primary)' }}>{m.label}</div>
                     {!isMobile && <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{m.desc}</div>}
                     {stats?.avg_bands?.[m.label.toLowerCase()] && (
                       <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>avg</span>
-                        <span style={{ fontFamily: 'Space Mono', fontSize: 12, fontWeight: 700, color: getBandColor(stats.avg_bands[m.label.toLowerCase()]) }}>{stats.avg_bands[m.label.toLowerCase()]}</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>avg</span>
+                        <span style={{ fontFamily: 'var(--font-score)', fontSize: 12, fontWeight: 700, color: getBandColor(stats.avg_bands[m.label.toLowerCase()]) }}>{stats.avg_bands[m.label.toLowerCase()]}</span>
                       </div>
                     )}
                   </div>
@@ -199,13 +216,13 @@ export default function Dashboard() {
           {/* Tools row — visible on mobile below modules */}
           {isMobile && (
             <div style={{ marginTop: 12 }}>
-              <h2 style={{ fontSize: 15, marginBottom: 10, fontFamily: 'Space Grotesk' }}>Tools</h2>
+              <h2 style={{ fontSize: 15, marginBottom: 10, fontFamily: 'var(--font-display)' }}>Tools</h2>
               <div style={{ display: 'flex', gap: 8 }}>
                 {tools.map(t => (
                   <Link key={t.to} to={t.to} style={{ flex: 1, textDecoration: 'none' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '14px 8px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, transition: 'all 0.2s' }}>
                       <t.icon size={18} style={{ color: t.color }} />
-                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'Space Grotesk' }}>{t.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-display)' }}>{t.label}</span>
                     </div>
                   </Link>
                 ))}
@@ -217,13 +234,13 @@ export default function Dashboard() {
         {/* Band scores — desktop only sidebar, mobile shows below */}
         {(!isMobile || latest_bands) && (
           <div>
-            <h2 style={{ fontSize: isMobile ? 15 : 17, marginBottom: 12, fontFamily: 'Space Grotesk', marginTop: isMobile ? 16 : 0 }}>Current Bands</h2>
+            <h2 style={{ fontSize: isMobile ? 15 : 17, marginBottom: 12, fontFamily: 'var(--font-display)', marginTop: isMobile ? 16 : 0 }}>Current Bands</h2>
             <GlowCard>
               {latest_bands ? (
                 <>
                   <div style={{ textAlign: 'center', marginBottom: 16, padding: '10px', background: 'var(--bg-elevated)', borderRadius: 10 }}>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>OVERALL BAND</div>
-                    <div style={{ fontFamily: 'Space Mono', fontSize: 40, fontWeight: 700, color: getBandColor(latest_bands.overall_band) }}>{latest_bands.overall_band}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>OVERALL BAND</div>
+                    <div style={{ fontFamily: 'var(--font-score)', fontSize: 40, fontWeight: 700, color: getBandColor(latest_bands.overall_band) }}>{latest_bands.overall_band}</div>
                   </div>
                   <BandScoreBar label="Writing" score={latest_bands.writing_band} />
                   <BandScoreBar label="Speaking" score={latest_bands.speaking_band} />
@@ -260,14 +277,14 @@ export default function Dashboard() {
       {/* Recent sessions */}
       {recent_sessions?.length > 0 && (
         <div>
-          <h2 style={{ fontSize: isMobile ? 15 : 17, marginBottom: 12, fontFamily: 'Space Grotesk' }}>Recent Sessions</h2>
+          <h2 style={{ fontSize: isMobile ? 15 : 17, marginBottom: 12, fontFamily: 'var(--font-display)' }}>Recent Sessions</h2>
           <GlowCard>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     {['Module', 'Band', 'Date'].map(h => (
-                      <th key={h} style={{ padding: isMobile ? '8px 10px' : '8px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ padding: isMobile ? '8px 10px' : '8px 12px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -275,7 +292,7 @@ export default function Dashboard() {
                   {recent_sessions.map(s => (
                     <tr key={s.id} style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: isMobile ? '10px' : '12px', fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{s.module.replace('_', ' ')}</td>
-                      <td style={{ padding: isMobile ? '10px' : '12px', fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700, color: getBandColor(s.band_score) }}>{s.band_score ?? '—'}</td>
+                      <td style={{ padding: isMobile ? '10px' : '12px', fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color: getBandColor(s.band_score) }}>{s.band_score ?? '—'}</td>
                       <td style={{ padding: isMobile ? '10px' : '12px', fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(s.created_at)}</td>
                     </tr>
                   ))}

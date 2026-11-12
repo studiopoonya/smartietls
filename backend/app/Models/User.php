@@ -20,6 +20,8 @@ class User extends Authenticatable
         'password',
         'anthropic_api_key',
         'target_band',
+        'skill_minimums',
+        'feedback_language',
         'streak_days',
         'last_active_date',
         'exam_date',
@@ -43,6 +45,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'target_band'       => 'float',
+            'skill_minimums'    => 'array',
             'last_active_date'  => 'date',
             'exam_date'         => 'date',
             'plan_start_date'   => 'date',
@@ -75,9 +79,23 @@ class User extends Authenticatable
         return $admin?->getDecryptedApiKey();
     }
 
+    /** ANTHROPIC_API_KEY in .env wins; keys saved from the dashboard are only a fallback. */
     public function effectiveApiKey(): ?string
     {
-        return $this->hasApiKey() ? $this->getDecryptedApiKey() : static::systemApiKey();
+        return config('services.anthropic.key')
+            ?: ($this->hasApiKey() ? $this->getDecryptedApiKey() : static::systemApiKey());
+    }
+
+    /** True when ANTHROPIC_API_KEY in .env is set, which overrides every key saved from the dashboard. */
+    public static function usesServerKey(): bool
+    {
+        return !empty(config('services.anthropic.key'));
+    }
+
+    /** Whether AI features work for this user, from any source: .env, their own key, or an admin's key. */
+    public function aiReady(): bool
+    {
+        return static::usesServerKey() || $this->hasApiKey() || static::systemApiKey() !== null;
     }
 
     public function getHasApiKeyAttribute(): bool

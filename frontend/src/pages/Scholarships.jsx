@@ -287,7 +287,7 @@ export default function Scholarships() {
   );
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 860 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 860, margin: '0 auto' }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
@@ -302,12 +302,12 @@ export default function Scholarships() {
       {/* Filters */}
       <div style={{ marginBottom: 20 }}>
         {/* Region filter */}
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none', marginBottom: 10 }}>
+        <div className="chip-row" style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none', marginBottom: 10 }}>
           {REGIONS.map(r => (
             <button key={r.id} onClick={() => setRegion(r.id)}
               style={{
                 flexShrink: 0, padding: '6px 13px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                fontFamily: 'Space Grotesk', cursor: 'pointer',
+                fontFamily: 'var(--font-display)', cursor: 'pointer',
                 background: region === r.id ? 'var(--accent-success)' : 'var(--bg-elevated)',
                 color: region === r.id ? '#fff' : 'var(--text-secondary)',
                 border: 'none', transition: 'all 0.2s',
@@ -323,8 +323,8 @@ export default function Scholarships() {
           {LEVELS.map(l => (
             <button key={l.id} onClick={() => setLevel(l.id)}
               style={{
-                padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-                fontFamily: 'Space Grotesk', cursor: 'pointer',
+                padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                fontFamily: 'var(--font-display)', cursor: 'pointer',
                 background: level === l.id ? 'rgba(6,182,212,0.15)' : 'transparent',
                 color: level === l.id ? 'var(--accent-secondary)' : 'var(--text-muted)',
                 border: `1px solid ${level === l.id ? 'rgba(6,182,212,0.4)' : 'var(--border)'}`,
@@ -370,11 +370,11 @@ function ScholarshipCard({ s, isMobile }) {
           {/* Info */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>{s.name}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>{s.name}</span>
               <span style={{
-                fontSize: 10, padding: '2px 8px', borderRadius: 10, fontWeight: 700,
+                fontSize: 12, padding: '2px 8px', borderRadius: 10, fontWeight: 700,
                 background: isFull ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
-                color: isFull ? 'var(--accent-success)' : '#F59E0B',
+                color: isFull ? 'var(--accent-success)' : '#AE5408',
                 border: `1px solid ${isFull ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`,
               }}>
                 {isFull ? 'Full Funding' : 'Partial'}
@@ -384,13 +384,13 @@ function ScholarshipCard({ s, isMobile }) {
 
             {/* Quick stats */}
             <div style={{ display: 'flex', gap: isMobile ? 10 : 16, flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-secondary)' }}>
                 <Globe size={11} style={{ color: 'var(--text-muted)' }} />{s.destination}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-secondary)' }}>
                 <Calendar size={11} style={{ color: 'var(--text-muted)' }} />{s.deadline}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-secondary)' }}>
                 <BookOpen size={11} style={{ color: 'var(--text-muted)' }} />
                 {s.level.map(l => l === 'master' ? "Master's" : 'PhD').join(' / ')}
               </div>
@@ -408,33 +408,33 @@ function ScholarshipCard({ s, isMobile }) {
             {/* Deadline note */}
             {s.deadlineNote && (
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 14, padding: '8px 12px', borderRadius: 8, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)' }}>
-                <Calendar size={12} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 2 }} />
-                <p style={{ fontSize: 12, color: '#F59E0B', margin: 0, lineHeight: 1.6 }}>{s.deadlineNote}</p>
+                <Calendar size={12} style={{ color: '#AE5408', flexShrink: 0, marginTop: 2 }} />
+                <p style={{ fontSize: 12, color: '#AE5408', margin: 0, lineHeight: 1.6 }}>{s.deadlineNote}</p>
               </div>
             )}
 
             {/* Amount + IELTS row */}
             <div style={{ display: 'flex', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
               <div style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
-                <div style={{ fontSize: 10, color: 'var(--accent-success)', fontWeight: 600, marginBottom: 2, textTransform: 'uppercase' }}>Amount</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Space Mono' }}>{s.amount}</div>
+                <div style={{ fontSize: 12, color: 'var(--accent-success)', fontWeight: 600, marginBottom: 2, textTransform: 'uppercase' }}>Amount</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-score)' }}>{s.amount}</div>
               </div>
               <div style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-                <div style={{ fontSize: 10, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 2, textTransform: 'uppercase' }}>IELTS Min.</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Space Mono' }}>{s.ielts}+</div>
+                <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 2, textTransform: 'uppercase' }}>IELTS Min.</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-score)' }}>{s.ielts}+</div>
               </div>
             </div>
 
             {/* Tags */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
               {s.tags.map((tag, i) => (
-                <span key={i} style={{ fontSize: 11, padding: '3px 9px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text-muted)' }}>{tag}</span>
+                <span key={i} style={{ fontSize: 12, padding: '3px 9px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text-muted)' }}>{tag}</span>
               ))}
             </div>
 
             {/* Link */}
             <a href={s.url} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 9, background: 'var(--accent-primary)', color: '#fff', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: 'Space Grotesk' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 9, background: 'var(--accent-primary)', color: '#fff', textDecoration: 'none', fontSize: 13, fontWeight: 600, fontFamily: 'var(--font-display)' }}>
               <ExternalLink size={13} /> Visit Official Website
             </a>
           </motion.div>

@@ -25,22 +25,22 @@ export default function MobileHeader({ onMenuOpen }) {
         {user && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 20, padding: '4px 10px' }}>
-              <Flame size={13} style={{ color: '#F59E0B' }} />
-              <span style={{ fontFamily: 'Space Mono', fontSize: 12, fontWeight: 700, color: '#F59E0B' }}>{user.streak_days ?? 0}</span>
+              <Flame size={13} style={{ color: '#AE5408' }} />
+              <span style={{ fontFamily: 'var(--font-score)', fontSize: 12, fontWeight: 700, color: '#AE5408' }}>{user.streak_days ?? 0}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 20, padding: '4px 10px' }}>
               <Target size={12} style={{ color: 'var(--accent-glow)' }} />
-              <span style={{ fontFamily: 'Space Mono', fontSize: 12, fontWeight: 700, color: 'var(--accent-glow)' }}>{user.target_band ?? 7}</span>
+              <span style={{ fontFamily: 'var(--font-score)', fontSize: 12, fontWeight: 700, color: 'var(--accent-glow)' }}>{user.target_band ?? 7}</span>
             </div>
           </>
         )}
-        <button onClick={toggleTheme} style={{
+        <button type="button" aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} onClick={toggleTheme} style={{
           width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)',
         }}>
           {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <button onClick={onMenuOpen} style={{
+        <button type="button" aria-label="Open menu" onClick={onMenuOpen} style={{
           width: 34, height: 34, borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)',
         }}>

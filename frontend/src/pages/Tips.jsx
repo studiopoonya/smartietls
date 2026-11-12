@@ -5,13 +5,13 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import GlowCard from '../components/common/GlowCard';
 
 const SECTIONS = [
-  { id: 'all',       label: 'All',       color: '#7C3AED' },
-  { id: 'mindset',   label: 'Mindset',   color: '#EC4899', icon: Heart },
-  { id: 'writing',   label: 'Writing',   color: '#7C3AED', icon: PenLine },
-  { id: 'speaking',  label: 'Speaking',  color: '#06B6D4', icon: Mic2 },
-  { id: 'reading',   label: 'Reading',   color: '#10B981', icon: BookOpen },
-  { id: 'listening', label: 'Listening', color: '#F59E0B', icon: Headphones },
-  { id: 'general',   label: 'General',   color: '#EC4899', icon: Star },
+  { id: 'all',       label: 'All',       color: '#6A35E8' },
+  { id: 'mindset',   label: 'Mindset',   color: '#CF2873', icon: Heart },
+  { id: 'writing',   label: 'Writing',   color: '#6A35E8', icon: PenLine },
+  { id: 'speaking',  label: 'Speaking',  color: '#0A7A9E', icon: Mic2 },
+  { id: 'reading',   label: 'Reading',   color: '#0A7F5C', icon: BookOpen },
+  { id: 'listening', label: 'Listening', color: '#AE5408', icon: Headphones },
+  { id: 'general',   label: 'General',   color: '#CF2873', icon: Star },
 ];
 
 const TIPS = [
@@ -67,8 +67,8 @@ const TIPS = [
 ];
 
 const SECTION_COLORS = {
-  mindset: '#EC4899', writing: '#7C3AED', speaking: '#06B6D4',
-  reading: '#10B981', listening: '#F59E0B', general: '#EC4899',
+  mindset: '#CF2873', writing: '#6A35E8', speaking: '#0A7A9E',
+  reading: '#0A7F5C', listening: '#AE5408', general: '#CF2873',
 };
 
 export default function Tips() {
@@ -81,7 +81,7 @@ export default function Tips() {
   const bonusTips  = filtered.filter(t => t.level === 'tip');
 
   return (
-    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 860 }}>
+    <div style={{ padding: pad, maxWidth: isMobile ? '100%' : 860, margin: '0 auto' }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
@@ -94,12 +94,12 @@ export default function Tips() {
       </motion.div>
 
       {/* Section tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 22, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+      <div className="chip-row" style={{ display: 'flex', gap: 8, marginBottom: 22, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
         {SECTIONS.map(s => (
           <button key={s.id} onClick={() => setActive(s.id)}
             style={{
               flexShrink: 0, padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-              fontFamily: 'Space Grotesk', cursor: 'pointer', border: 'none', transition: 'all 0.2s',
+              fontFamily: 'var(--font-display)', cursor: 'pointer', border: 'none', transition: 'all 0.2s',
               background: active === s.id ? s.color : 'var(--bg-elevated)',
               color: active === s.id ? '#fff' : 'var(--text-secondary)',
               boxShadow: active === s.id ? `0 0 12px ${s.color}55` : 'none',
@@ -114,10 +114,10 @@ export default function Tips() {
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           style={{ marginBottom: 20, padding: '16px 20px', borderRadius: 14, background: 'linear-gradient(135deg, rgba(236,72,153,0.12), rgba(124,58,237,0.08))', border: '1px solid rgba(236,72,153,0.25)', display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(236,72,153,0.15)', border: '1px solid rgba(236,72,153,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Heart size={18} style={{ color: '#EC4899' }} />
+            <Heart size={18} style={{ color: '#CF2873' }} />
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--text-primary)', marginBottom: 3 }}>Kamu sudah di sini — itu sudah setengah jalan.</div>
+            <div style={{ fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginBottom: 3 }}>Kamu sudah di sini — itu sudah setengah jalan.</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>Rasa takut belajar dirasakan hampir semua orang. Tips di bawah ini bukan tentang IELTS — tapi tentang cara membuatnya terasa lebih ringan.</div>
           </div>
         </motion.div>
@@ -128,7 +128,7 @@ export default function Tips() {
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <CheckCircle2 size={14} style={{ color: 'var(--accent-success)' }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-success)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Must-Know ({essentials.length})</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-success)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Must-Know ({essentials.length})</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
             {essentials.map((tip, i) => (
@@ -142,8 +142,8 @@ export default function Tips() {
       {bonusTips.length > 0 && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <Star size={13} style={{ color: '#F59E0B' }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Pro Tips ({bonusTips.length})</span>
+            <Star size={13} style={{ color: '#AE5408' }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#AE5408', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Pro Tips ({bonusTips.length})</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
             {bonusTips.map((tip, i) => (
@@ -170,7 +170,7 @@ function TipCard({ tip, isMobile }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: open ? 8 : 0 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.4 }}>{tip.title}</span>
-              <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 10, background: `${color}20`, color, fontWeight: 600, flexShrink: 0 }}>
+              <span style={{ fontSize: 12, padding: '2px 7px', borderRadius: 10, background: `${color}20`, color, fontWeight: 600, flexShrink: 0 }}>
                 {tip.section}
               </span>
             </div>

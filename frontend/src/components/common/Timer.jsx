@@ -27,7 +27,7 @@ export default function Timer({ running = true, onTick, initialSeconds = 0 }) {
   const s = (seconds % 60).toString().padStart(2, '0');
 
   return (
-    <span style={{ fontFamily: 'Space Mono', fontSize: 14, color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+    <span style={{ fontFamily: 'var(--font-score)', fontSize: 14, color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
       <Clock size={14} />{m}:{s}
     </span>
   );

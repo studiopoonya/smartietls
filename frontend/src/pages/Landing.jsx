@@ -4,10 +4,10 @@ import { ArrowRight, Zap, Target, TrendingUp, BookOpen, Mic2, PenLine, Headphone
 import logo from '../assets/logo-removebg-preview.png';
 
 const features = [
-  { icon: PenLine, title: 'AI Writing Coach', desc: 'Real-time band scores across all 4 IELTS criteria with line-by-line feedback.', color: 'var(--accent-primary)' },
-  { icon: Mic2, title: 'Speaking Examiner', desc: 'Practice with an AI examiner that responds, evaluates, and guides you.', color: 'var(--accent-secondary)' },
-  { icon: BookOpen, title: 'Reading Practice', desc: 'AI-generated authentic passages with True/False, MCQ, and matching questions.', color: 'var(--accent-success)' },
-  { icon: Headphones, title: 'Listening Simulator', desc: 'Generated conversation transcripts and comprehension questions for practice.', color: 'var(--accent-warning)' },
+  { icon: PenLine, title: 'AI Writing Coach', desc: 'Real-time band scores across all 4 IELTS criteria with line-by-line feedback.', color: '#6A35E8' },
+  { icon: Mic2, title: 'Speaking Examiner', desc: 'Practice with an AI examiner that responds, evaluates, and guides you.', color: '#0A7A9E' },
+  { icon: BookOpen, title: 'Reading Practice', desc: 'AI-generated authentic passages with True/False, MCQ, and matching questions.', color: '#0A7F5C' },
+  { icon: Headphones, title: 'Listening Simulator', desc: 'Generated conversation transcripts and comprehension questions for practice.', color: '#AE5408' },
 ];
 
 export default function Landing() {
@@ -23,15 +23,15 @@ export default function Landing() {
           <img src={logo} alt="Smart IELTS" style={{ height: 38, objectFit: 'contain' }} />
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <Link to="/register" style={{ padding: '9px 20px', borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'Space Grotesk', boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}>Get Started</Link>
-          <Link to="/login" style={{ padding: '9px 20px', borderRadius: 10, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 14, fontWeight: 500, fontFamily: 'Space Grotesk', transition: 'all 0.2s' }}>Log in</Link>
+          <Link to="/register" style={{ padding: '9px 20px', borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 600, fontFamily: 'var(--font-display)', boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}>Get Started</Link>
+          <Link to="/login" style={{ padding: '9px 20px', borderRadius: 10, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 14, fontWeight: 500, fontFamily: 'var(--font-display)', transition: 'all 0.2s' }}>Log in</Link>
         </div>
       </nav>
 
       {/* Hero */}
       <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '100px 40px 80px' }}>
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <h1 style={{ fontSize: 'clamp(40px, 7vw, 76px)', fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 24, maxWidth: 800, margin: '0 auto 24px' }}>
+          <h1 style={{ fontSize: 'clamp(40px, 7vw, 76px)', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 24, maxWidth: 800, margin: '0 auto 24px' }}>
             Score Band 7+ with
             <span style={{ display: 'block', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>AI-Powered IELTS Prep</span>
           </h1>
@@ -39,7 +39,7 @@ export default function Landing() {
             Get real-time feedback from an AI examiner trained on official IELTS band descriptors. Writing, Speaking, Reading, Listening — all four skills in one platform.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 16, fontWeight: 700, fontFamily: 'Space Grotesk', boxShadow: '0 0 40px rgba(124,58,237,0.4)' }}>
+            <Link to="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 16, fontWeight: 700, fontFamily: 'var(--font-display)', boxShadow: '0 0 40px rgba(124,58,237,0.4)' }}>
               Start for free <ArrowRight size={18} />
             </Link>
             <Link to="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', borderRadius: 12, border: '1px solid var(--border)', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 16, fontWeight: 500, background: 'var(--bg-elevated)' }}>
@@ -52,7 +52,7 @@ export default function Landing() {
       {/* Features */}
       <section style={{ position: 'relative', zIndex: 1, padding: '60px 40px 100px', maxWidth: 1100, margin: '0 auto' }}>
         <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.5 }}
-          style={{ textAlign: 'center', fontSize: 36, marginBottom: 60, fontFamily: 'Space Grotesk' }}>
+          style={{ textAlign: 'center', fontSize: 36, marginBottom: 60, fontFamily: 'var(--font-display)' }}>
           Everything you need to ace IELTS
         </motion.h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
@@ -62,7 +62,7 @@ export default function Landing() {
               <div style={{ width: 44, height: 44, borderRadius: 12, background: `${f.color}20`, border: `1px solid ${f.color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                 <f.icon size={20} style={{ color: f.color }} />
               </div>
-              <h3 style={{ fontSize: 17, marginBottom: 8, fontFamily: 'Space Grotesk' }}>{f.title}</h3>
+              <h3 style={{ fontSize: 17, marginBottom: 8, fontFamily: 'var(--font-display)' }}>{f.title}</h3>
               <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.desc}</p>
             </motion.div>
           ))}
@@ -74,7 +74,7 @@ export default function Landing() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 60, flexWrap: 'wrap' }}>
           {[['Band 7+', 'Average improvement'], ['4 Skills', 'Writing, Speaking, Reading, Listening'], ['Real-time', 'AI feedback on every attempt']].map(([stat, label]) => (
             <div key={stat}>
-              <div style={{ fontFamily: 'Space Mono', fontSize: 32, fontWeight: 700, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{stat}</div>
+              <div style={{ fontFamily: 'var(--font-score)', fontSize: 32, fontWeight: 700, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{stat}</div>
               <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>{label}</div>
             </div>
           ))}
@@ -84,9 +84,9 @@ export default function Landing() {
       {/* CTA */}
       <section style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '80px 40px' }}>
         <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-          <h2 style={{ fontSize: 40, fontFamily: 'Space Grotesk', marginBottom: 16 }}>Ready to level up?</h2>
+          <h2 style={{ fontSize: 40, fontFamily: 'var(--font-display)', marginBottom: 16 }}>Ready to level up?</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 32, fontSize: 16 }}>Start practicing with your personal AI IELTS tutor today.</p>
-          <Link to="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 36px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 17, fontWeight: 700, fontFamily: 'Space Grotesk', boxShadow: '0 0 60px rgba(124,58,237,0.5)' }}>
+          <Link to="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 36px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', color: 'white', textDecoration: 'none', fontSize: 17, fontWeight: 700, fontFamily: 'var(--font-display)', boxShadow: '0 0 60px rgba(124,58,237,0.5)' }}>
             Get started for free <ArrowRight size={20} />
           </Link>
         </motion.div>

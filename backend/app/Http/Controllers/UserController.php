@@ -22,6 +22,9 @@ class UserController extends Controller
             'exam_date' => $user->exam_date?->toDateString(),
             'is_admin' => $user->is_admin,
             'has_api_key' => $user->hasApiKey(),
+            'ai_ready' => $user->aiReady(),
+            'uses_server_key' => \App\Models\User::usesServerKey(),
+            'feedback_language' => $user->feedback_language ?? 'en',
         ]);
     }
 
@@ -29,8 +32,11 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'target_band' => 'sometimes|integer|min:4|max:9',
+            'target_band' => 'sometimes|numeric|min:4|max:9|multiple_of:0.5',
+            'skill_minimums' => 'sometimes|array:listening,reading,writing,speaking',
+            'skill_minimums.*' => 'nullable|numeric|min:4|max:9|multiple_of:0.5',
             'exam_date' => 'sometimes|nullable|date|after:today',
+            'feedback_language' => 'sometimes|in:en,id',
         ]);
 
         $request->user()->update($validated);

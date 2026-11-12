@@ -40,18 +40,18 @@ export default function AdminUsers() {
     const active = sort === col;
     return (
       <th onClick={() => toggleSort(col)}
-        style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: active ? 'var(--accent-glow)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+        style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: active ? 'var(--accent-glow)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
         {label} {active ? (dir === 'desc' ? '↓' : '↑') : ''}
       </th>
     );
   }
 
   return (
-    <div style={{ padding: isMobile ? '20px 16px' : '32px 36px', maxWidth: 1200 }}>
+    <div style={{ padding: isMobile ? '20px 16px' : '32px 36px', maxWidth: 1200, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', marginBottom: isMobile ? 18 : 24, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 14 : 0 }}>
         <div>
-          <h1 style={{ fontSize: isMobile ? 20 : 24, fontFamily: 'Space Grotesk', marginBottom: 4 }}>Users</h1>
+          <h1 style={{ fontSize: isMobile ? 20 : 24, fontFamily: 'var(--font-display)', marginBottom: 4 }}>Users</h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
             {meta.total != null ? `${meta.total} total registered users` : 'All registered users'}
           </p>
@@ -82,13 +82,13 @@ export default function AdminUsers() {
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>
                   <SortHeader col="name"            label="User" />
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>Band</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>Band</th>
                   <SortHeader col="streak_days"     label="Streak" />
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>Sessions</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>Vocab</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>Sessions</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>Vocab</th>
                   <SortHeader col="last_active_date" label="Last Active" />
                   <SortHeader col="created_at"      label="Joined" />
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Role</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Role</th>
                   <th style={{ padding: '10px 12px' }} />
                 </tr>
               </thead>
@@ -106,28 +106,28 @@ export default function AdminUsers() {
                         </div>
                         <div>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{u.name}</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{u.email}</div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{u.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: '14px 12px', fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700, color: 'var(--accent-glow)' }}>{u.target_band}</td>
+                    <td style={{ padding: '14px 12px', fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color: 'var(--accent-glow)' }}>{u.target_band}</td>
                     <td style={{ padding: '14px 12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700, color: u.streak_days > 0 ? '#F59E0B' : 'var(--text-muted)' }}>
-                        {u.streak_days > 0 && <Flame size={12} style={{ color: '#F59E0B' }} />}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color: u.streak_days > 0 ? '#AE5408' : 'var(--text-muted)' }}>
+                        {u.streak_days > 0 && <Flame size={12} style={{ color: '#AE5408' }} />}
                         {u.streak_days}d
                       </div>
                     </td>
-                    <td style={{ padding: '14px 12px', fontFamily: 'Space Mono', fontSize: 13, color: 'var(--text-secondary)' }}>{u.learning_sessions_count}</td>
-                    <td style={{ padding: '14px 12px', fontFamily: 'Space Mono', fontSize: 13, color: 'var(--text-secondary)' }}>{u.vocabularies_count}</td>
+                    <td style={{ padding: '14px 12px', fontFamily: 'var(--font-score)', fontSize: 13, color: 'var(--text-secondary)' }}>{u.learning_sessions_count}</td>
+                    <td style={{ padding: '14px 12px', fontFamily: 'var(--font-score)', fontSize: 13, color: 'var(--text-secondary)' }}>{u.vocabularies_count}</td>
                     <td style={{ padding: '14px 12px', fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(u.last_active_date)}</td>
                     <td style={{ padding: '14px 12px', fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(u.created_at)}</td>
                     <td style={{ padding: '14px 12px' }}>
                       {u.is_admin ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 5, padding: '2px 7px' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 5, padding: '2px 7px' }}>
                           <ShieldCheck size={10} />ADMIN
                         </span>
                       ) : (
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>User</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>User</span>
                       )}
                     </td>
                     <td style={{ padding: '14px 12px' }}>

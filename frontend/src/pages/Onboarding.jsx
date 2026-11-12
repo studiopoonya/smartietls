@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Bell, CheckCircle, ArrowRight, Clock } from 'lucide-react';
+import { TARGET_BANDS } from '../data/skills';
+import { toast } from '../components/common/Toast';
 import { useMutation } from '@tanstack/react-query';
 import api from '../lib/axios';
 import { useAppStore } from '../store/useAppStore';
@@ -13,8 +15,8 @@ const PLANS = [
     label: '2 Weeks',
     subtitle: 'Intensive',
     description: 'Fast-track preparation for an upcoming exam.',
-    lessonsPerDay: '1–2 lessons/day',
-    color: '#EF4444',
+    lessonsPerDay: '2 lessons/day',
+    color: '#D5301F',
     emoji: '⚡',
   },
   {
@@ -23,7 +25,7 @@ const PLANS = [
     subtitle: 'Balanced',
     description: 'Steady progress with manageable daily targets.',
     lessonsPerDay: '1 lesson/day',
-    color: '#7C3AED',
+    color: '#6A35E8',
     emoji: '🎯',
     recommended: true,
   },
@@ -32,8 +34,8 @@ const PLANS = [
     label: '8 Weeks',
     subtitle: 'Relaxed',
     description: 'Deep learning with plenty of practice time.',
-    lessonsPerDay: '3–4 days/lesson',
-    color: '#10B981',
+    lessonsPerDay: '1 lesson every 2 days',
+    color: '#0A7F5C',
     emoji: '🌱',
   },
 ];
@@ -45,6 +47,7 @@ export default function Onboarding() {
 
   const [step, setStep] = useState(1);
   const [selectedWeeks, setSelectedWeeks] = useState(4);
+  const [targetBand, setTargetBand] = useState(Number(user?.target_band ?? 7));
   const [reminderTime, setReminderTime] = useState('08:00');
   const [reminderEnabled, setReminderEnabled] = useState(true);
 
@@ -54,10 +57,11 @@ export default function Onboarding() {
       updateUser(updatedUser);
       navigate('/dashboard');
     },
+    onError: (err) => toast(err.response?.data?.message && !err.response.data.message.startsWith('SQLSTATE') ? err.response.data.message : 'We could not save your plan. Please try again.', 'error'),
   });
 
   const handleFinish = () => {
-    savePlan({ study_weeks: selectedWeeks, reminder_time: reminderTime, reminder_enabled: reminderEnabled });
+    savePlan({ study_weeks: selectedWeeks, reminder_time: reminderTime, reminder_enabled: reminderEnabled, target_band: targetBand });
   };
 
   const handleSkip = () => {
@@ -100,7 +104,7 @@ export default function Onboarding() {
                 <div style={{ marginBottom: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                     <Calendar size={18} style={{ color: 'var(--accent-primary)' }} />
-                    <h2 style={{ fontFamily: 'Space Grotesk', fontSize: 20, margin: 0 }}>Choose your study plan</h2>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 20, margin: 0 }}>Choose your study plan</h2>
                   </div>
                   <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
                     Hi {user?.name?.split(' ')[0]}! How long do you have to prepare for IELTS?
@@ -117,7 +121,7 @@ export default function Onboarding() {
                         transition: 'all 0.2s', position: 'relative',
                       }}>
                       {plan.recommended && (
-                        <span style={{ position: 'absolute', top: -10, right: 14, fontSize: 10, fontWeight: 700, background: plan.color, color: 'white', padding: '2px 10px', borderRadius: 99 }}>
+                        <span style={{ position: 'absolute', top: -10, right: 14, fontSize: 12, fontWeight: 700, background: plan.color, color: 'white', padding: '2px 10px', borderRadius: 99 }}>
                           RECOMMENDED
                         </span>
                       )}
@@ -125,21 +129,33 @@ export default function Onboarding() {
                         <span style={{ fontSize: 24 }}>{plan.emoji}</span>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                            <span style={{ fontFamily: 'Space Grotesk', fontSize: 15, fontWeight: 700, color: selectedWeeks === plan.weeks ? plan.color : 'var(--text-primary)' }}>
+                            <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap', color: selectedWeeks === plan.weeks ? plan.color : 'var(--text-primary)' }}>
                               {plan.label}
                             </span>
-                            <span style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-card)', padding: '1px 8px', borderRadius: 99 }}>
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)', background: 'var(--bg-card)', padding: '1px 8px', borderRadius: 99 }}>
                               {plan.subtitle}
                             </span>
                           </div>
                           <p style={{ margin: 0, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{plan.description}</p>
+                          <span style={{ display: 'inline-block', marginTop: 6, fontSize: 12, fontWeight: 700, color: plan.color, background: `${plan.color}15`, padding: '3px 8px', borderRadius: 8 }}>
+                            {plan.lessonsPerDay}
+                          </span>
                         </div>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: plan.color, background: `${plan.color}15`, padding: '4px 8px', borderRadius: 8, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          {plan.lessonsPerDay}
-                        </span>
                       </div>
                     </button>
                   ))}
+                </div>
+
+                <div style={{ marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>University target band</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>The overall IELTS score your programme requires. You can change it later.</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {TARGET_BANDS.map(band => (
+                      <button key={band} type="button" aria-pressed={targetBand === band} onClick={() => setTargetBand(band)} style={{ padding: '7px 11px', borderRadius: 8, cursor: 'pointer', fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color: targetBand === band ? 'var(--accent-glow)' : 'var(--text-secondary)', background: targetBand === band ? 'rgba(124,58,237,0.2)' : 'var(--bg-elevated)', border: `1px solid ${targetBand === band ? 'var(--accent-primary)' : 'var(--border)'}` }}>
+                        {band.toFixed(1)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <button className="btn-primary" onClick={() => setStep(2)}
@@ -156,7 +172,7 @@ export default function Onboarding() {
                 <div style={{ marginBottom: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                     <Bell size={18} style={{ color: 'var(--accent-primary)' }} />
-                    <h2 style={{ fontFamily: 'Space Grotesk', fontSize: 20, margin: 0 }}>Set your daily reminder</h2>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 20, margin: 0 }}>Set your daily reminder</h2>
                   </div>
                   <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
                     We'll send you a daily email at your chosen time to keep you on track.
@@ -170,7 +186,7 @@ export default function Onboarding() {
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                       {PLANS.find(p => p.weeks === selectedWeeks)?.label} plan — {PLANS.find(p => p.weeks === selectedWeeks)?.lessonsPerDay}
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>20 lessons across Reading, Listening, Writing & Speaking</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Every core lesson, from the diagnostic to Reading, Listening, Writing & Speaking mastery</div>
                   </div>
                 </div>
 
@@ -181,7 +197,7 @@ export default function Onboarding() {
                       <Bell size={14} style={{ color: 'var(--text-secondary)' }} />
                       <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>Email reminders</span>
                     </div>
-                    <button onClick={() => setReminderEnabled(e => !e)} style={{
+                    <button data-compact aria-label="Toggle email reminders" aria-pressed={reminderEnabled} onClick={() => setReminderEnabled(e => !e)} style={{
                       width: 42, height: 24, borderRadius: 99, border: 'none', cursor: 'pointer', transition: 'all 0.2s', position: 'relative',
                       background: reminderEnabled ? 'var(--accent-primary)' : 'var(--bg-elevated)',
                     }}>
@@ -200,7 +216,7 @@ export default function Onboarding() {
                         Reminder time (sent to {user?.email})
                       </label>
                       <input type="time" value={reminderTime} onChange={e => setReminderTime(e.target.value)}
-                        className="input-dark" style={{ fontSize: 15, fontFamily: 'Space Mono' }} />
+                        className="input-dark" style={{ fontSize: 15, fontFamily: 'var(--font-score)' }} />
                     </motion.div>
                   )}
                 </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Key, CheckCircle, AlertCircle, ExternalLink, ArrowRight } from 'lucide-react';
 import api from '../lib/axios';
@@ -13,6 +14,8 @@ export default function Setup() {
   const [saving, setSaving] = useState(false);
   const [testResult, setTestResult] = useState(null);
   const updateUser = useAppStore(s => s.updateUser);
+  const { data: me } = useQuery({ queryKey: ['me'], queryFn: () => api.get('/user').then(r => r.data) });
+  const serverKey = !!me?.uses_server_key;
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -54,7 +57,14 @@ export default function Setup() {
         </div>
 
         <div className="glow-card" style={{ padding: isMobile ? 20 : 32, marginBottom: 16 }}>
-          <h3 style={{ fontSize: isMobile ? 15 : 16, marginBottom: 18, fontFamily: 'Space Grotesk' }}>Your Anthropic API Key</h3>
+          <h3 style={{ fontSize: isMobile ? 15 : 16, marginBottom: 18, fontFamily: 'var(--font-display)' }}>Your Anthropic API Key</h3>
+
+          {serverKey && (
+            <div role="note" style={{ background: 'color-mix(in srgb, var(--accent-warning) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-warning) 35%, transparent)', borderRadius: 10, padding: '12px 14px', marginBottom: 14, fontSize: 13, color: 'var(--text-primary)', display: 'flex', gap: 10, lineHeight: 1.5 }}>
+              <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 2, color: 'var(--accent-warning)' }} />
+              <span>The server already has <strong>ANTHROPIC_API_KEY</strong> set in its .env file. That key is used for every AI request, so a key saved here is only a backup if it is removed from .env.</span>
+            </div>
+          )}
 
           <div style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 18, fontSize: 13, color: 'var(--accent-secondary)', display: 'flex', gap: 10 }}>
             <ExternalLink size={15} style={{ flexShrink: 0, marginTop: 1 }} />
@@ -102,7 +112,7 @@ export default function Setup() {
               value={examDate}
               onChange={e => setExamDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              style={{ fontSize: 14, colorScheme: 'dark' }}
+              style={{ fontSize: 14 }}
             />
             {examDate && (
               <div style={{ fontSize: 12, color: 'var(--accent-secondary)', marginTop: 6 }}>

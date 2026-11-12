@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Shield, ShieldOff, Trash2, Pencil, Flame, BookMarked, Layers, TrendingUp, AlertTriangle } from 'lucide-react';
+import { TARGET_BANDS } from '../../data/skills';
 import { useAdminUser, useToggleAdmin, useDeleteUser, useUpdateUser } from '../../hooks/useAdmin';
 import { getBandColor, formatDate } from '../../lib/utils';
 import BandScoreBar from '../../components/common/BandScoreBar';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
 const MODULE_COLORS = {
-  writing: '#7C3AED', speaking: '#06B6D4', reading: '#10B981',
-  listening: '#F59E0B', mock_test: '#EF4444',
+  writing: '#6A35E8', speaking: '#0A7A9E', reading: '#0A7F5C',
+  listening: '#AE5408', mock_test: '#D5301F',
 };
 
 export default function AdminUserDetail() {
@@ -70,7 +71,7 @@ export default function AdminUserDetail() {
   }
 
   return (
-    <div style={{ padding: isMobile ? '20px 16px' : '32px 36px', maxWidth: 1000 }}>
+    <div style={{ padding: isMobile ? '20px 16px' : '32px 36px', maxWidth: 1000, margin: '0 auto' }}>
       {/* Back + action message */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 18 : 24, flexWrap: 'wrap', gap: 10 }}>
         <button onClick={() => navigate('/admin/users')}
@@ -96,14 +97,14 @@ export default function AdminUserDetail() {
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
-              <h2 style={{ fontSize: isMobile ? 17 : 20, fontFamily: 'Space Grotesk', fontWeight: 700 }}>{user?.name}</h2>
+              <h2 style={{ fontSize: isMobile ? 17 : 20, fontFamily: 'var(--font-display)', fontWeight: 700 }}>{user?.name}</h2>
               {user?.is_admin && (
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 5, padding: '2px 7px' }}>ADMIN</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 5, padding: '2px 7px' }}>ADMIN</span>
               )}
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', overflowWrap: 'break-word' }}>{user?.email}</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-              Member since {formatDate(user?.created_at)} · Band goal: <span style={{ color: 'var(--accent-glow)', fontFamily: 'Space Mono', fontWeight: 700 }}>{user?.target_band}</span>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+              Member since {formatDate(user?.created_at)} · Band goal: <span style={{ color: 'var(--accent-glow)', fontFamily: 'var(--font-score)', fontWeight: 700 }}>{user?.target_band}</span>
             </div>
           </div>
         </div>
@@ -129,18 +130,18 @@ export default function AdminUserDetail() {
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: isMobile ? 10 : 14, marginBottom: 20 }}>
         {[
-          { icon: Layers,    label: 'Sessions',   value: user?.session_count ?? 0,  color: '#7C3AED' },
-          { icon: BookMarked,label: 'Vocab Words', value: user?.vocab_count ?? 0,    color: '#06B6D4' },
-          { icon: Flame,     label: 'Streak',      value: `${user?.streak_days ?? 0}d`, color: '#F59E0B' },
-          { icon: TrendingUp,label: 'Overall Band', value: latest_snapshot?.overall_band ?? '—', color: '#10B981', mono: true },
+          { icon: Layers,    label: 'Sessions',   value: user?.session_count ?? 0,  color: '#6A35E8' },
+          { icon: BookMarked,label: 'Vocab Words', value: user?.vocab_count ?? 0,    color: '#0A7A9E' },
+          { icon: Flame,     label: 'Streak',      value: `${user?.streak_days ?? 0}d`, color: '#AE5408' },
+          { icon: TrendingUp,label: 'Overall Band', value: latest_snapshot?.overall_band ?? '—', color: '#0A7F5C', mono: true },
         ].map((s, i) => (
           <motion.div key={s.label} className="glow-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
             style={{ padding: '16px 18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
               <s.icon size={14} style={{ color: s.color }} />
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{s.label}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>{s.label}</span>
             </div>
-            <div style={{ fontFamily: s.mono ? 'Space Mono' : 'Space Grotesk', fontSize: 24, fontWeight: 700, color: s.color }}>{s.value}</div>
+            <div style={{ fontFamily: s.mono ? 'var(--font-score)' : 'var(--font-display)', fontSize: 24, fontWeight: 700, color: s.color }}>{s.value}</div>
           </motion.div>
         ))}
       </div>
@@ -150,7 +151,7 @@ export default function AdminUserDetail() {
         <motion.div className="glow-card" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-            <h3 style={{ fontSize: 14, fontFamily: 'Space Grotesk', fontWeight: 700 }}>Recent Sessions</h3>
+            <h3 style={{ fontSize: 14, fontFamily: 'var(--font-display)', fontWeight: 700 }}>Recent Sessions</h3>
             <button onClick={() => navigate(`/admin/users/${id}/progress`)}
               style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--accent-glow)', cursor: 'pointer', fontSize: 12, fontWeight: 600, padding: 0 }}>
               <TrendingUp size={13} /> View Full Progress
@@ -162,7 +163,7 @@ export default function AdminUserDetail() {
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-elevated)' }}>
                     {['Module', 'Band', 'Duration', 'Date'].map(h => (
-                      <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -175,7 +176,7 @@ export default function AdminUserDetail() {
                           <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{s.module.replace('_', ' ')}</span>
                         </div>
                       </td>
-                      <td style={{ padding: '11px 14px', fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700, color: getBandColor(s.band_score) }}>{s.band_score ?? '—'}</td>
+                      <td style={{ padding: '11px 14px', fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700, color: getBandColor(s.band_score) }}>{s.band_score ?? '—'}</td>
                       <td style={{ padding: '11px 14px', fontSize: 12, color: 'var(--text-muted)' }}>
                         {s.duration_seconds ? `${Math.round(s.duration_seconds / 60)}m` : '—'}
                       </td>
@@ -193,12 +194,12 @@ export default function AdminUserDetail() {
         {/* Band scores */}
         <motion.div className="glow-card" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
           style={{ padding: '18px 20px' }}>
-          <h3 style={{ fontSize: 14, fontFamily: 'Space Grotesk', fontWeight: 700, marginBottom: 16 }}>Band Scores</h3>
+          <h3 style={{ fontSize: 14, fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: 16 }}>Band Scores</h3>
           {latest_snapshot ? (
             <>
               <div style={{ textAlign: 'center', padding: '10px', background: 'var(--bg-elevated)', borderRadius: 10, marginBottom: 16 }}>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>OVERALL</div>
-                <div style={{ fontFamily: 'Space Mono', fontSize: 36, fontWeight: 700, color: getBandColor(latest_snapshot.overall_band) }}>{latest_snapshot.overall_band}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>OVERALL</div>
+                <div style={{ fontFamily: 'var(--font-score)', fontSize: 36, fontWeight: 700, color: getBandColor(latest_snapshot.overall_band) }}>{latest_snapshot.overall_band}</div>
               </div>
               <BandScoreBar label="Writing"   score={latest_snapshot.writing_band} />
               <BandScoreBar label="Speaking"  score={latest_snapshot.speaking_band} />
@@ -226,7 +227,7 @@ export default function AdminUserDetail() {
               <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
                 <AlertTriangle size={22} style={{ color: 'var(--accent-danger)' }} />
               </div>
-              <h3 style={{ fontSize: 18, fontFamily: 'Space Grotesk', marginBottom: 10 }}>Delete User?</h3>
+              <h3 style={{ fontSize: 18, fontFamily: 'var(--font-display)', marginBottom: 10 }}>Delete User?</h3>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.6 }}>
                 This will permanently delete <strong>{user?.name}</strong> and all their sessions, vocabulary, and progress data. This cannot be undone.
               </p>
@@ -251,7 +252,7 @@ export default function AdminUserDetail() {
             <motion.div initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
               onClick={e => e.stopPropagation()}
               style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: isMobile ? '24px 20px' : '28px 32px', maxWidth: 420, width: '90%' }}>
-              <h3 style={{ fontSize: 17, fontFamily: 'Space Grotesk', marginBottom: 20 }}>Edit User</h3>
+              <h3 style={{ fontSize: 17, fontFamily: 'var(--font-display)', marginBottom: 20 }}>Edit User</h3>
 
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>Name</label>
@@ -270,9 +271,9 @@ export default function AdminUserDetail() {
               <div style={{ marginBottom: 20 }}>
                 <label style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 500 }}>Target Band</label>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {[4, 5, 6, 7, 8, 9].map(b => (
-                    <button key={b} onClick={() => setEditForm(f => ({ ...f, target_band: b }))}
-                      style={{ padding: '7px 13px', borderRadius: 8, border: `1px solid ${editForm.target_band === b ? 'var(--accent-primary)' : 'var(--border)'}`, background: editForm.target_band === b ? 'rgba(124,58,237,0.2)' : 'var(--bg-elevated)', color: editForm.target_band === b ? 'var(--accent-glow)' : 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'Space Mono', fontSize: 13, fontWeight: 700 }}>
+                  {TARGET_BANDS.map(b => (
+                    <button key={b} type="button" onClick={() => setEditForm(f => ({ ...f, target_band: b }))}
+                      style={{ padding: '7px 13px', borderRadius: 8, border: `1px solid ${editForm.target_band === b ? 'var(--accent-primary)' : 'var(--border)'}`, background: editForm.target_band === b ? 'rgba(124,58,237,0.2)' : 'var(--bg-elevated)', color: editForm.target_band === b ? 'var(--accent-glow)' : 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font-score)', fontSize: 13, fontWeight: 700 }}>
                       {b}
                     </button>
                   ))}

@@ -10,25 +10,16 @@ export default function AppLayout() {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  if (isMobile) {
-    return (
-      <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
-        <MobileHeader onMenuOpen={() => setDrawerOpen(true)} />
-        <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
-        <main style={{ flex: 1, overflowY: 'auto', paddingBottom: 72 }}>
-          <Outlet />
-        </main>
-        <BottomNav onMenuOpen={() => setDrawerOpen(true)} />
-      </div>
-    );
-  }
-
+  // <main> keeps the same position in both layouts, so crossing the mobile breakpoint
+  // (rotating a phone, resizing a window) does not remount the page and wipe drill answers.
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-      <Sidebar />
-      <main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
+      {isMobile ? <MobileHeader onMenuOpen={() => setDrawerOpen(true)} /> : <Sidebar />}
+      {isMobile && <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />}
+      <main style={{ flex: 1, minWidth: 0, paddingBottom: isMobile ? 'calc(76px + env(safe-area-inset-bottom, 0px))' : 0 }}>
         <Outlet />
       </main>
+      {isMobile && <BottomNav onMenuOpen={() => setDrawerOpen(true)} />}
     </div>
   );
 }
