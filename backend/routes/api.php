@@ -78,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Study plan
     Route::get('/study-plan', [StudyPlanController::class, 'show']);
     Route::post('/study-plan', [StudyPlanController::class, 'store']);
+    Route::put('/study-plan/reminder', [StudyPlanController::class, 'updateReminder']);
 
     // Levels (per-module difficulty unlock progression)
     Route::get('/levels', [LevelController::class, 'index']);

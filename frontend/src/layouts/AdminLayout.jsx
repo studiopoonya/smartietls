@@ -23,7 +23,7 @@ export default function AdminLayout() {
 
   if (isMobile) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
+      <div style={{ minHeight: '100vh', background: 'transparent' }}>
         <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'var(--header-bg)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
             <div style={{ width: 30, height: 30, borderRadius: 8, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-glow))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -110,7 +110,7 @@ export default function AdminLayout() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'transparent' }}>
       {/* Sidebar */}
       <div style={{ width: 220, background: 'var(--bg-card)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh' }}>
         <div style={{ padding: '18px 16px', borderBottom: '1px solid var(--border)' }}>

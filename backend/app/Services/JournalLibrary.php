@@ -90,18 +90,21 @@ class JournalLibrary
                 $xml = '';
             }
 
-            if ($xml !== '') {
-                $article = self::parseArticle($xml, $pmcid);
-                if ($article === false) return null;
-                if ($article !== null) return $article;
-            }
+            $article = $xml !== '' ? self::parseArticle($xml, $pmcid) : null;
+            if ($article === false) return null;
+            if (is_array($article) && $article['licence'] !== null) return $article;
 
-            // No usable full text: fall back to the abstract from the search index.
+            // The full text is missing, or it does not state its licence: the search index decides.
             $meta = $this->get('/search', ['query' => 'PMCID:' . $pmcid, 'format' => 'json', 'resultType' => 'core', 'pageSize' => 1]);
             $record = $meta['resultList']['result'][0] ?? null;
             if (!$record || !$this->licenceAllowed($record['license'] ?? null)) return null;
 
-            return $this->summary($record) + ['abstract' => self::cleanText($record['abstractText'] ?? ''), 'sections' => []];
+            $summary = $this->summary($record);
+            if (is_array($article)) {
+                return ['licence' => $summary['licence'], 'licenceUrl' => $summary['licenceUrl']] + $article;
+            }
+
+            return $summary + ['abstract' => self::cleanText($record['abstractText'] ?? ''), 'sections' => []];
         });
     }
 
@@ -199,12 +202,27 @@ class JournalLibrary
         }
         $first = fn (string $query) => ($node = $xpath->query($query)->item(0)) ? self::nodeText($node) : null;
 
-        $licenceUrl = $first('//article-meta//permissions//*[local-name()="license_ref"]')
-            ?? $xpath->evaluate('string(//article-meta//permissions/license/@*[local-name()="href"])')
-            ?: ($first('//article-meta//permissions/license') ?? '');
-        preg_match('#https?://creativecommons\.org/\S+#i', (string) $licenceUrl, $match);
-        $licence = self::licenceFromUrl($match[0] ?? (string) $licenceUrl);
-        if ($licence === null) return false;
+        // Publishers state the licence in different places: an ali:license_ref element, an href on
+        // <license>, or a link inside the licence sentence. Every Creative Commons URL found is checked.
+        $candidates = [];
+        foreach ($xpath->query('//article-meta//permissions//@*[local-name()="href"] | //article-meta//permissions//*[local-name()="license_ref"]') as $node) {
+            $candidates[] = trim($node->nodeValue);
+        }
+        $candidates[] = $xpath->evaluate('string(//article-meta//permissions)');
+        $ccUrls = [];
+        foreach ($candidates as $text) {
+            preg_match_all('#https?://creativecommons\.org/[^\s"<>)]+#i', $text, $found);
+            array_push($ccUrls, ...$found[0]);
+        }
+
+        $licence = null;
+        foreach ($ccUrls as $url) {
+            $licence = self::licenceFromUrl($url);
+            if ($licence !== null) break;
+        }
+        // A Creative Commons licence that is not one we accept (NC or ND) rules the article out.
+        // No licence URL at all is left for the caller to settle from the search index.
+        if ($licence === null && $ccUrls !== []) return false;
 
         $authors = [];
         foreach ($xpath->query('//article-meta/contrib-group/contrib[@contrib-type="author"]') as $contrib) {
@@ -235,8 +253,8 @@ class JournalLibrary
             'journal'    => $first('//journal-meta//journal-title'),
             'year'       => $year ? (int) $year : null,
             'doi'        => $first('//article-meta/article-id[@pub-id-type="doi"]'),
-            'licence'    => strtoupper($licence),
-            'licenceUrl' => self::licenceUrl($licence),
+            'licence'    => $licence ? strtoupper($licence) : null,
+            'licenceUrl' => $licence ? self::licenceUrl($licence) : null,
             'snippet'    => '',
             'sourceUrl'  => 'https://europepmc.org/article/PMC/' . $pmcid,
             'abstract'   => $abstract,

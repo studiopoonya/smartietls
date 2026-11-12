@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Bell, CheckCircle, ArrowRight, Clock } from 'lucide-react';
 import { TARGET_BANDS } from '../data/skills';
 import { toast } from '../components/common/Toast';
+import { browserTimezone } from '../components/common/ReminderSettings';
 import { useMutation } from '@tanstack/react-query';
 import api from '../lib/axios';
 import { useAppStore } from '../store/useAppStore';
@@ -61,15 +62,15 @@ export default function Onboarding() {
   });
 
   const handleFinish = () => {
-    savePlan({ study_weeks: selectedWeeks, reminder_time: reminderTime, reminder_enabled: reminderEnabled, target_band: targetBand });
+    savePlan({ study_weeks: selectedWeeks, reminder_time: reminderTime, reminder_enabled: reminderEnabled, target_band: targetBand, timezone: browserTimezone() });
   };
 
   const handleSkip = () => {
-    savePlan({ study_weeks: 4, reminder_time: '08:00', reminder_enabled: false });
+    savePlan({ study_weeks: 4, reminder_time: '08:00', reminder_enabled: false, timezone: browserTimezone() });
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
       {/* Ambient bg */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124,58,237,0.15) 0%, transparent 60%)' }} />
 

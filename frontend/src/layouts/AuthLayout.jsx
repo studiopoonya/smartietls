@@ -4,7 +4,7 @@ import logo from '../assets/logo-removebg-preview.png';
 
 export default function AuthLayout() {
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
       {/* Ambient background */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none',

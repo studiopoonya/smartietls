@@ -12,6 +12,7 @@ import { getBandColor, formatDate } from '../lib/utils';
 import { useCurriculum } from '../hooks/useCurriculum';
 import { nextAvailableLesson } from '../data/skills';
 import { BaselineCard } from './learn/LearningPath';
+import ReminderSettings from '../components/common/ReminderSettings';
 
 const modules = [
   { to: '/learn/writing', icon: PenLine, label: 'Writing', color: '#6A35E8', desc: 'Task 1 & 2 feedback' },
@@ -132,6 +133,8 @@ export default function Dashboard() {
           </div>
         </motion.div>
       )}
+
+      {planData && <ReminderSettings key={`${planData.reminder_enabled}-${planData.reminder_time}`} plan={planData} />}
 
       {/* Learning path: next step and baseline */}
       {curriculum && (

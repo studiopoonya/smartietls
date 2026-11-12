@@ -90,6 +90,32 @@ XML;
         $this->assertStringNotContainsString('Figure text', json_encode($article));
     }
 
+    public function test_licence_links_inside_the_licence_sentence_are_recognised(): void
+    {
+        // The format several publishers use: the licence URL sits on a link inside <license-p>.
+        $sentence = '<license><license-p>Distributed under the <ext-link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike License</ext-link>.</license-p></license>';
+        $xml = preg_replace('#<license>.*?</license>#s', $sentence, self::XML);
+
+        $this->fakeEuropePmc([$this->record('PMC1', 'cc by-sa')], xml: $xml);
+        $this->getJson('/api/journals/PMC1')->assertOk()->assertJsonPath('licence', 'CC BY-SA')->assertJsonCount(4, 'sections');
+
+        Cache::flush();
+        $this->fakeEuropePmc([$this->record('PMC1', 'cc by')], xml: str_replace('licenses/by-sa/4.0', 'licenses/by-nc/4.0', $xml));
+        $this->getJson('/api/journals/PMC1')->assertNotFound();
+    }
+
+    public function test_full_text_without_a_licence_uses_the_search_index(): void
+    {
+        $xml = preg_replace('#<permissions>.*?</permissions>#s', '', self::XML);
+
+        $this->fakeEuropePmc([$this->record('PMC1', 'cc0')], xml: $xml);
+        $this->getJson('/api/journals/PMC1')->assertOk()->assertJsonPath('licence', 'CC0')->assertJsonCount(4, 'sections');
+
+        Cache::flush();
+        $this->fakeEuropePmc([$this->record('PMC1', 'cc by-nd')], xml: $xml);
+        $this->getJson('/api/journals/PMC1')->assertNotFound();
+    }
+
     public function test_without_full_text_the_abstract_is_still_shown(): void
     {
         $this->fakeEuropePmc([$this->record('PMC1', 'cc by')], xml: null, xmlStatus: 404);

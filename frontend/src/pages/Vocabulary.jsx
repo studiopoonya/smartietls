@@ -156,7 +156,7 @@ function FlashcardMode({ words, onClose }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'var(--bg-primary)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'var(--bg-page)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-secondary)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

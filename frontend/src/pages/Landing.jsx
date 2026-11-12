@@ -12,7 +12,7 @@ const features = [
 
 export default function Landing() {
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent', overflowX: 'hidden' }}>
       {/* Ambient bg */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
         background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124,58,237,0.2) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 90% 80%, rgba(6,182,212,0.1) 0%, transparent 50%)' }} />

@@ -69,7 +69,7 @@ function ExamShell({ exam, answers, onFinish, onQuit, submitting, palette, child
   const isMobile = useIsMobile();
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', flexDirection: 'column', background: 'var(--bg-page)' }}>
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: isMobile ? '8px 12px' : '10px 16px', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
         {isMobile ? (
           <div style={{ fontSize: 15, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>{STAGE_LABELS[exam.stage]}</div>
@@ -153,7 +153,7 @@ function ObjectiveStage({ exam, answers, setAnswers, submitting, onFinish, onQui
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
           <article style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: isMobile ? 16 : 20, borderRight: isMobile ? 'none' : '1px solid var(--border)', display: hidden('passage') }}>
             <h2 style={{ fontSize: 17, fontFamily: 'var(--font-display)', marginBottom: 4 }}>{unit.title}</h2>
-            <HighlightableText key={part} text={unit.passage} highlights={highlights[part] ?? []} onChange={ranges => setHighlights(h => ({ ...h, [part]: ranges }))} textStyle={{ fontSize: 16 }} background="var(--bg-primary)" />
+            <HighlightableText key={part} text={unit.passage} highlights={highlights[part] ?? []} onChange={ranges => setHighlights(h => ({ ...h, [part]: ranges }))} textStyle={{ fontSize: 16 }} background="var(--header-bg)" />
           </article>
           {questionColumn}
         </div>

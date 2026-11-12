@@ -103,7 +103,7 @@ export default function JournalReader() {
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>About {minutes} min read</div>
       </header>
 
-      <div style={{ position: 'sticky', top: isMobile ? 66 : 0, zIndex: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '8px 0', marginBottom: 12, background: 'var(--bg-primary)', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ position: 'sticky', top: isMobile ? 66 : 0, zIndex: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '8px 0', marginBottom: 12, background: 'var(--header-bg)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <button type="button" data-compact aria-label="Smaller text" disabled={size === SIZES[0]} onClick={() => changeSize(-1)} className="btn-secondary" style={{ width: 34, height: 34, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
           <span style={{ fontSize: 12, color: 'var(--text-muted)', width: 34, textAlign: 'center', fontFamily: 'var(--font-score)' }}>{size}px</span>

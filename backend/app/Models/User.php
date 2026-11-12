@@ -30,6 +30,7 @@ class User extends Authenticatable
         'plan_start_date',
         'reminder_time',
         'reminder_enabled',
+        'timezone',
     ];
 
     protected $hidden = [

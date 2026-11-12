@@ -9,31 +9,43 @@
   --font-body: 'Nunito', system-ui, sans-serif;
   --font-score: 'Fredoka', 'Nunito', system-ui, sans-serif;
 
-  --bg-primary: #FFF8EC;
-  --bg-secondary: #FFF3E0;
-  --bg-elevated: #FFF4E3;
-  --bg-card: #FFFFFF;
-  --bg-input: #FFFDF8;
-  --bg-dots: rgba(106, 53, 232, 0.07);
+  /* Soft glass: pastel colour blobs behind frosted, translucent surfaces. */
+  --bg-page:
+    radial-gradient(46% 40% at 6% 4%, rgba(247, 170, 205, 0.9), transparent 70%),
+    radial-gradient(42% 38% at 94% 8%, rgba(196, 178, 246, 0.9), transparent 70%),
+    radial-gradient(38% 30% at 60% 48%, rgba(250, 200, 225, 0.45), transparent 70%),
+    radial-gradient(48% 42% at 10% 98%, rgba(253, 205, 185, 0.85), transparent 70%),
+    radial-gradient(46% 42% at 92% 94%, rgba(180, 214, 247, 0.85), transparent 70%),
+    linear-gradient(160deg, #FAEDF5 0%, #F2EBFA 50%, #F6EEF3 100%);
+  --bg-primary: #F8F0F7;
+  --bg-secondary: rgba(255, 250, 253, 0.84);
+  --bg-elevated: rgba(244, 233, 246, 0.72);
+  --bg-card: rgba(255, 255, 255, 0.62);
+  --bg-input: rgba(255, 255, 255, 0.78);
+  --bg-dots: transparent;
 
   --accent-primary: #6A35E8;
   --accent-glow: #5B2BD6;
+  --accent-pink: #B4378F;
   --accent-secondary: #0A7A9E;
   --accent-success: #0A7F5C;
   --accent-danger: #D5301F;
   --accent-warning: #AE5408;
 
   --text-primary: #2B2148;
-  --text-secondary: #5A5175;
-  --text-muted: #6F6688;
+  --text-secondary: #54496F;
+  --text-muted: #675E80;
 
-  --border: #EADFCB;
+  --border: rgba(150, 118, 170, 0.24);
+  --glass-edge: rgba(255, 255, 255, 0.85);
+  --glass-blur: blur(18px) saturate(160%);
   --border-glow: rgba(106, 53, 232, 0.3);
   --glow-purple: rgba(106, 53, 232, 0.08);
   --glow-cyan: rgba(10, 122, 158, 0.08);
-  --header-bg: rgba(255, 248, 236, 0.92);
-  --card-shadow: 0 4px 0 #EADFCB;
-  --card-shadow-hover: 0 7px 0 #E0D2B8;
+  --header-bg: rgba(255, 250, 253, 0.62);
+  --card-shadow: 0 10px 30px rgba(120, 80, 150, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --card-shadow-hover: 0 16px 40px rgba(120, 80, 150, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --button-shadow: 0 8px 22px rgba(106, 53, 232, 0.28);
   --highlight-bg: #FFE27A;
   --mark-error: rgba(213, 48, 31, 0.14);
   --mark-word: rgba(174, 84, 8, 0.16);
@@ -42,31 +54,41 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --bg-primary: #0A0A0F;
-  --bg-secondary: #111118;
-  --bg-elevated: #1A1A25;
-  --bg-card: #16161F;
-  --bg-input: #1A1A25;
-  --bg-dots: rgba(255, 255, 255, 0.03);
+  --bg-page:
+    radial-gradient(42% 38% at 8% 6%, rgba(160, 60, 130, 0.35), transparent 70%),
+    radial-gradient(40% 36% at 92% 10%, rgba(100, 70, 200, 0.38), transparent 70%),
+    radial-gradient(46% 40% at 12% 96%, rgba(170, 80, 70, 0.22), transparent 70%),
+    radial-gradient(44% 40% at 90% 92%, rgba(50, 110, 180, 0.3), transparent 70%),
+    linear-gradient(160deg, #150F22 0%, #120E1F 50%, #17101C 100%);
+  --bg-primary: #140E20;
+  --bg-secondary: rgba(24, 18, 38, 0.86);
+  --bg-elevated: rgba(255, 255, 255, 0.06);
+  --bg-card: rgba(36, 27, 56, 0.55);
+  --bg-input: rgba(255, 255, 255, 0.06);
+  --bg-dots: transparent;
 
   --accent-primary: #7C3AED;
   --accent-glow: #A855F7;
+  --accent-pink: #C2418F;
   --accent-secondary: #06B6D4;
   --accent-success: #10B981;
   --accent-danger: #EF4444;
   --accent-warning: #F59E0B;
 
   --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #7C8BA1;
+  --text-secondary: #B6B0CC;
+  --text-muted: #9690AE;
 
-  --border: #1E293B;
+  --border: rgba(255, 255, 255, 0.1);
+  --glass-edge: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(18px) saturate(140%);
   --border-glow: rgba(124, 58, 237, 0.4);
   --glow-purple: rgba(124, 58, 237, 0.15);
   --glow-cyan: rgba(6, 182, 212, 0.15);
-  --header-bg: rgba(17, 17, 24, 0.92);
-  --card-shadow: 0 4px 0 #1E293B;
-  --card-shadow-hover: 0 7px 0 #2A3A52;
+  --header-bg: rgba(22, 16, 36, 0.62);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --card-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --button-shadow: 0 8px 22px rgba(124, 58, 237, 0.35);
   --highlight-bg: rgba(250, 204, 21, 0.38);
   --mark-error: rgba(239, 68, 68, 0.22);
   --mark-word: rgba(245, 158, 11, 0.22);
@@ -93,8 +115,29 @@ html, body {
 }
 
 body {
-  background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
+  background: transparent;
+}
+
+/* The glass backdrop sits on a fixed layer, because background-attachment: fixed is unreliable on phones. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--bg-page);
+}
+
+/*
+ * Frosted glass for translucent surfaces. Most components set their background inline, so they are
+ * matched by the token they use. Layers that need to stay readable over moving content get the blur.
+ */
+.glass,
+[style*="background: var(--bg-card)"],
+[style*="background: var(--bg-secondary)"],
+[style*="background: var(--header-bg)"] {
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
 }
 
 #root {
@@ -119,51 +162,53 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
-/* Sticker card */
+/* Glass card */
 .glow-card {
   background: var(--bg-card);
-  border: 2px solid var(--border);
-  border-radius: 20px;
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge);
+  border-radius: 22px;
   box-shadow: var(--card-shadow);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
 .glow-card:hover {
   box-shadow: var(--card-shadow-hover);
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
-/* Squishy buttons: the inset edge shrinks as the button is pressed */
+/* Soft pill buttons with a gentle glow */
 .btn-primary,
 .btn-chunky {
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   font-family: var(--font-display);
   font-weight: 600;
-  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+  box-shadow: var(--button-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
 .btn-primary {
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-pink));
   color: white;
-  padding: 10px 20px 12px;
+  padding: 11px 20px;
   font-size: 15px;
   cursor: pointer;
 }
 
 .btn-primary:hover:not(:disabled),
 .btn-chunky:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
   transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled),
 .btn-chunky:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 3px 10px rgba(106, 53, 232, 0.22);
 }
 
 .btn-primary:disabled,
@@ -175,16 +220,18 @@ h1, h2, h3, h4 {
 
 .btn-secondary {
   background: var(--bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   color: var(--text-primary);
-  border: 2px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
   padding: 10px 20px;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 3px 0 var(--border);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.15s ease;
+  box-shadow: 0 4px 14px rgba(120, 80, 150, 0.1);
+  transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -193,8 +240,8 @@ h1, h2, h3, h4 {
 }
 
 .btn-secondary:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--border);
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(120, 80, 150, 0.1);
 }
 
 :focus-visible {
@@ -220,8 +267,9 @@ h1, h2, h3, h4 {
 /* Input styles */
 .input-dark {
   background: var(--bg-input);
-  border: 2px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 3px rgba(120, 80, 150, 0.08);
+  border-radius: 16px;
   color: var(--text-primary);
   padding: 12px 16px;
   font-size: 15px;
@@ -234,7 +282,7 @@ h1, h2, h3, h4 {
 
 .input-dark:focus {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--border-glow);
+  box-shadow: 0 0 0 4px var(--border-glow);
 }
 
 .input-dark::placeholder {

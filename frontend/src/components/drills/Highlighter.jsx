@@ -26,7 +26,7 @@ export function mergeRanges(ranges) {
  * Reading text the learner can mark up, like the highlighter in computer-delivered IELTS.
  * Pass highlights and onChange to keep the marks when the text is hidden and shown again.
  */
-export default function HighlightableText({ text, highlights, onChange, textStyle, background = 'var(--bg-elevated)' }) {
+export default function HighlightableText({ text, highlights, onChange, textStyle, background = 'var(--header-bg)' }) {
   const [ownHighlights, setOwnHighlights] = useState([]);
   const ranges = highlights ?? ownHighlights;
   const setRanges = onChange ?? setOwnHighlights;

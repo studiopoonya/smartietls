@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\StudyPlanController;
 use App\Mail\StudyReminderMail;
 use App\Models\User;
 use App\Services\CurriculumProgress;
@@ -15,13 +16,21 @@ class SendStudyReminders extends Command
 
     public function handle(CurriculumProgress $progress): void
     {
-        $now = now()->format('H:i');
+        // The server runs on UTC, but a learner who picks 08:00 means 08:00 where they live.
+        $base = User::where('reminder_enabled', true)->whereNotNull('study_weeks')->whereNotNull('plan_start_date');
+        $users = collect();
 
-        $users = User::where('reminder_enabled', true)
-            ->where('reminder_time', $now)
-            ->whereNotNull('study_weeks')
-            ->whereNotNull('plan_start_date')
-            ->get();
+        foreach ((clone $base)->distinct()->pluck('timezone') as $timezone) {
+            $zone = $timezone && in_array($timezone, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC), true) ? $timezone : StudyPlanController::DEFAULT_TIMEZONE;
+            $localTime = now($zone)->format('H:i');
+
+            $users = $users->merge(
+                (clone $base)
+                    ->where(fn ($q) => $timezone === null ? $q->whereNull('timezone') : $q->where('timezone', $timezone))
+                    ->where('reminder_time', $localTime)
+                    ->get()
+            );
+        }
 
         $total = $progress->totalLessons();
 
@@ -41,9 +50,14 @@ class SendStudyReminders extends Command
                 'on_track'          => $completed >= $expected,
             ];
 
-            Mail::to($user->email)->send(new StudyReminderMail($user, $plan));
-
-            $this->info("Sent reminder to {$user->email}");
+            // One bad address or a mail-server hiccup must not stop everyone else's reminder.
+            try {
+                Mail::to($user->email)->send(new StudyReminderMail($user, $plan));
+                $this->info("Sent reminder to user #{$user->id}");
+            } catch (\Throwable $e) {
+                report($e);
+                $this->error("Could not send reminder to user #{$user->id}");
+            }
         }
 
         $this->info("Done. Sent to {$users->count()} user(s).");
